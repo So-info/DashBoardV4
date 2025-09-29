@@ -306,16 +306,23 @@ document.addEventListener('click', (e)=>{
       switchTab(b.dataset.tab);
     });
 
-    // Login
-    $('#btnGoogle').addEventListener('click', async ()=>{
-      const provider = new GoogleAuthProvider();
-      try {
-        await signInWithPopup(auth, provider);
-      } catch (err) {
-        alert('Connexion Google refusée.');
-        console.error(err);
-      }
-    });
+// Login
+import { signInWithRedirect } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
+
+$('#btnGoogle').addEventListener('click', async ()=>{
+  const provider = new GoogleAuthProvider();
+  try {
+    await signInWithPopup(auth, provider);
+  } catch (err) {
+    // Popup annulé/fermé → tenter le redirect
+    if (err?.code === 'auth/cancelled-popup-request' || err?.code === 'auth/popup-closed-by-user' || err?.code === 'auth/popup-blocked') {
+      try { await signInWithRedirect(auth, provider); return; } catch(e) {}
+    }
+    alert('Connexion Google refusée. Vérifie que ton domaine est autorisé dans Firebase Authentication > Authorized domains.');
+    console.error(err);
+  }
+});
+
 
     // Sign out
     $('#btnSignOut').addEventListener('click', ()=> signOut(auth));
@@ -336,21 +343,30 @@ document.addEventListener('click', (e)=>{
         return;
       }
 
-      // First login: create profile doc if missing
-      const uref = doc(db, 'users', user.uid);
-      const snap = await getDoc(uref);
-      if(!snap.exists()){
-        await setDoc(uref, {
-          email: user.email || null,
-          displayName: user.displayName || null,
-          photoURL: user.photoURL || null,
-          role: 'reception', // rôle par défaut minimal
-          createdAt: serverTimestamp()
-        });
-      }
 
-      // Read role
-      const role = (await getDoc(uref)).data().role || 'reception';
+// First login: créer le profil minimal s'il manque
+const uref = doc(db, 'users', user.uid);
+const usnap = await getDoc(uref);
+if(!usnap.exists()){
+  await setDoc(uref, {
+    email: user.email || null,
+    displayName: user.displayName || null,
+    photoURL: user.photoURL || null,
+    createdAt: serverTimestamp()
+  });
+}
+
+// Rôle depuis /roles/{uid} (défaut reception si absent)
+const rref = doc(db, 'roles', user.uid);
+let role = 'reception';
+const rsnap = await getDoc(rref);
+if(!rsnap.exists()){
+  // crée un rôle par défaut pour ne pas bloquer l'app la 1re fois
+  await setDoc(rref, { role: 'reception', updatedAt: serverTimestamp() });
+} else {
+  role = rsnap.data().role || 'reception';
+}
+
 
       // UI toggle
       hide(pageLogin); show(app);
@@ -583,55 +599,59 @@ wireInventories(role);
     }
 
     // ===== Inventory logic =====
-    function wireInventories(role){
-      // Inventory – Tech
-      if(role==='tech' || role==='admin' || role==='reception'){
-        setupInventory('tech', '#formInvTech', '#listInvTech');
-      }
-      // Inventory – Clean
-      if(role==='clean' || role==='admin' || role==='reception'){
-        setupInventory('clean', '#formInvClean', '#listInvClean');
-      }
+// ===== Inventory logic =====
+function wireInventories(role){
+  // Technique
+  if(role==='tech' || role==='admin' || role==='reception'){
+    setupInventory('technique', '#formInvTech', '#listInvTech');
+  }
+  // Ménage
+  if(role==='clean' || role==='admin' || role==='reception'){
+    setupInventory('menage', '#formInvClean', '#listInvClean');
+  }
 
-      function setupInventory(kind, formSel, listSel){
-        const form = document.querySelector(formSel);
-        const list = document.querySelector(listSel);
-        form.addEventListener('submit', async (e)=>{
-          e.preventDefault();
-          const fd = new FormData(form);
-          const name = (fd.get('name')||'').toString().trim();
-          let qty = parseInt(fd.get('qty')||'1', 10) || 1;
-          if(!name) return;
-          await addDoc(collection(db, `inventory_${kind}`), { name, qty, createdAt: serverTimestamp() });
-          form.reset();
+  function setupInventory(kind, formSel, listSel){
+    const form = document.querySelector(formSel);
+    const list = document.querySelector(listSel);
+
+    form.addEventListener('submit', async (e)=>{
+      e.preventDefault();
+      const fd = new FormData(form);
+      const name = (fd.get('name')||'').toString().trim();
+      let qty = parseInt(fd.get('qty')||'1', 10) || 1;
+      if(!name) return;
+      await addDoc(collection(db, `inventaires/${kind}/items`), { name, qty, createdAt: serverTimestamp() });
+      form.reset();
+    });
+
+    onSnapshot(query(collection(db, `inventaires/${kind}/items`), orderBy('createdAt','desc')), (qs)=>{
+      list.innerHTML='';
+      qs.forEach(d=>{
+        const it = { id:d.id, ...d.data() };
+        const li = document.createElement('li');
+        li.className = 'rounded-xl border p-3 bg-white flex items-center justify-between gap-2';
+        li.innerHTML = `
+          <div class="font-semibold">${it.name}</div>
+          <div class="flex items-center gap-2">
+            <button class="btn btn-outline" data-act="dec">−1</button>
+            <span class="w-8 text-center">${it.qty}</span>
+            <button class="btn btn-outline" data-act="inc">+1</button>
+            <button class="btn btn-primary" data-act="del">Supprimer</button>
+          </div>
+        `;
+        li.addEventListener('click', async (e)=>{
+          const b = e.target.closest('button[data-act]'); if(!b) return;
+          const ref = doc(db, `inventaires/${kind}/items`, it.id);
+          if(b.dataset.act==='inc') await updateDoc(ref, { qty: (it.qty||0)+1 });
+          if(b.dataset.act==='dec') await updateDoc(ref, { qty: Math.max(0, (it.qty||0)-1) });
+          if(b.dataset.act==='del') await updateDoc(ref, { qty: -1 }); // ou deleteDoc(ref) si tu préfères
         });
-        onSnapshot(query(collection(db, `inventory_${kind}`), orderBy('createdAt','desc')), (qs)=>{
-          list.innerHTML='';
-          qs.forEach(d=>{
-            const it = { id:d.id, ...d.data() };
-            const li = document.createElement('li');
-            li.className = 'rounded-xl border p-3 bg-white flex items-center justify-between gap-2';
-            li.innerHTML = `
-              <div class="font-semibold">${it.name}</div>
-              <div class="flex items-center gap-2">
-                <button class="btn btn-outline" data-act="dec">−1</button>
-                <span class="w-8 text-center">${it.qty}</span>
-                <button class="btn btn-outline" data-act="inc">+1</button>
-                <button class="btn btn-primary" data-act="del">Supprimer</button>
-              </div>
-            `;
-            li.addEventListener('click', async (e)=>{
-              const b = e.target.closest('button[data-act]'); if(!b) return;
-              const ref = doc(db, `inventory_${kind}`, it.id);
-              if(b.dataset.act==='inc') await updateDoc(ref, { qty: (it.qty||0)+1 });
-              if(b.dataset.act==='dec') await updateDoc(ref, { qty: Math.max(0, (it.qty||0)-1) });
-              if(b.dataset.act==='del') await updateDoc(ref, { qty: -1 }).then(()=>{ /* flag for cleanup */ });
-            });
-            list.appendChild(li);
-          });
-        });
-      }
-    }
+        list.appendChild(li);
+      });
+    });
+  }
+}
+
   </script>
 </body>
 </html>
