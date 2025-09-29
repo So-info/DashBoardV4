@@ -1,603 +1,110 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover" />
-  <title>La Plage — Intranet mobile</title>
-  <meta name="theme-color" content="#0ea5e9" />
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <style>
-    :root{--bg:#0b1220;--card:#0f172a;--muted:#94a3b8;--text:#e2e8f0;--brand:#0ea5e9;--ok:#22c55e;--warn:#f59e0b;--bad:#ef4444;--ring: rgba(14,165,233,.35)}
-    *{box-sizing:border-box}
-    html,body{height:100%}
-    body{margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;background:linear-gradient(180deg,#0b1220,#0b1220 20%,#0c1830 100%);color:var(--text)}
-    .container{max-width:820px;margin:0 auto;padding:clamp(12px,2.5vw,24px)}
-    header{position:sticky;top:0;z-index:10;background:rgba(11,18,32,.7);backdrop-filter:blur(8px);border-bottom:1px solid rgba(148,163,184,.12)}
-    .nav{display:flex;align-items:center;gap:10px;padding:10px 0}
-    .brand{display:flex;align-items:center;gap:10px;font-weight:700;letter-spacing:.3px}
-    .brand .logo{width:34px;height:34px;border-radius:10px;background:radial-gradient(120% 120% at 100% 0, #38bdf8, #0ea5e9 40%, #0ea5e9 60%, #0369a1 100%);box-shadow:0 10px 20px rgba(14,165,233,.35)}
-    .spacer{flex:1}
-    .pill{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border:1px solid rgba(148,163,184,.18);border-radius:999px;background:rgba(15,23,42,.6)}
-    .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 14px;border-radius:14px;border:1px solid rgba(148,163,184,.18);background:linear-gradient(180deg,rgba(255,255,255,.04),rgba(255,255,255,.02));color:var(--text);text-decoration:none;font-weight:600}
-    .btn:active{transform:translateY(1px)}
-    .btn.primary{background:linear-gradient(180deg, #38bdf8, #0ea5e9); border-color:rgba(14,165,233,.5); color:#05243a}
-    .btn.ghost{background:transparent}
-    .btn.small{padding:8px 10px;border-radius:12px;font-size:.92rem}
-    .grid{display:grid;gap:12px}
-    .grid.cards{grid-template-columns:1fr}
-    @media(min-width:640px){.grid.cards{grid-template-columns:repeat(2,1fr)}}
-    .card{background:linear-gradient(180deg,rgba(255,255,255,.04),rgba(255,255,255,.02));border:1px solid rgba(148,163,184,.18);border-radius:18px;padding:14px;box-shadow:0 10px 30px rgba(2,6,23,.4)}
-    .card h3{margin:4px 0 8px 0;font-size:1.05rem}
-    .muted{color:var(--muted)}
-    input, select, textarea{width:100%;padding:12px;border-radius:12px;background:#0f172a;border:1px solid rgba(148,163,184,.2);color:var(--text);outline:none}
-    textarea{min-height:90px}
-    .field{display:grid;gap:6px;margin:10px 0}
-    .row{display:flex;gap:8px}
-    .row > *{flex:1}
-    .tag{display:inline-flex;align-items:center;padding:6px 10px;border-radius:999px;border:1px solid rgba(148,163,184,.2);font-size:.85rem}
-    .status{font-weight:700}
-    .status.todo{color:var(--bad)}
-    .status.doing{color:var(--warn)}
-    .status.done{color:var(--ok)}
-    .list{display:grid;gap:10px}
-    .item{display:flex;align-items:center;gap:10px;justify-content:space-between;padding:10px;border:1px dashed rgba(148,163,184,.25);border-radius:12px}
-    .qty{font-weight:700}
-    .chip{padding:8px 10px;border-radius:999px;background:rgba(56,189,248,.18);border:1px solid rgba(56,189,248,.4);font-weight:600}
-    .hidden{display:none !important}
-    .danger{color:#fecaca}
-    .divider{height:1px;background:linear-gradient(90deg,transparent,rgba(148,163,184,.2),transparent);margin:10px 0}
-    footer{opacity:.7;font-size:.9rem;text-align:center;padding:20px 0}
-    .ring{box-shadow:0 0 0 4px var(--ring)}
-  </style>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover" />
+<title>La Plage — Intranet mobile</title>
+<meta name="theme-color" content="#0ea5e9" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#07111f;--surface:#0b1526;--elev:#0f1e36;--muted:#8aa0b8;--text:#eaf2ff;--brand:#22d3ee;--brand-2:#0ea5e9;--ok:#22c55e;--warn:#f59e0b;--bad:#ef4444;--ring: rgba(14,165,233,.45)}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;background:radial-gradient(120% 120% at 0% 0%,#061026,#081324 50%,#06101f 100%);color:var(--text)}
+.container{max-width:820px;margin:0 auto;padding:clamp(12px,2.5vw,24px)}
+
+
+/* ===== App Shell ===== */
+header{position:sticky;top:0;z-index:30;background:rgba(7,17,31,.75);backdrop-filter:blur(10px);border-bottom:1px solid rgba(148,163,184,.12)}
+.nav{display:flex;align-items:center;gap:10px;padding:10px 0}
+.brand{display:flex;align-items:center;gap:10px;font-weight:800;letter-spacing:.2px}
+.brand .logo{width:36px;height:36px;border-radius:10px;background:radial-gradient(120% 120% at 100% 0, #38bdf8, #0ea5e9 40%, #06b6d4 60%, #0369a1 100%);box-shadow:0 10px 20px rgba(14,165,233,.35)}
+.spacer{flex:1}
+
+
+/* Back button */
+.back{display:none;align-items:center;gap:8px;padding:10px;border-radius:12px;border:1px solid rgba(148,163,184,.18);background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,.02));font-weight:600}
+.back.show{display:inline-flex}
+
+
+/* Buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 14px;border-radius:16px;border:1px solid rgba(148,163,184,.18);background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.02));color:var(--text);text-decoration:none;font-weight:700;transition:transform .08s ease, box-shadow .2s ease}
+.btn:active{transform:translateY(1px)}
+.btn.primary{background:linear-gradient(180deg, var(--brand), var(--brand-2)); border-color:rgba(14,165,233,.5); color:#062c40;box-shadow:0 10px 30px rgba(34,211,238,.25)}
+.btn.ghost{background:transparent}
+.btn.small{padding:8px 10px;border-radius:12px;font-size:.92rem}
+.btn.icon{width:40px;height:40px;padding:0;border-radius:12px}
+
+
+/* Cards */
+.grid{display:grid;gap:12px}
+.grid.cards{grid-template-columns:1fr}
+@media(min-width:640px){.grid.cards{grid-template-columns:repeat(2,1fr)}}
+.card{background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,.02));border:1px solid rgba(148,163,184,.18);border-radius:20px;padding:16px;box-shadow:0 12px 40px rgba(2,6,23,.45);transition:transform .2s ease, box-shadow .2s ease}
+.card:hover{transform:translateY(-1px);box-shadow:0 16px 50px rgba(2,6,23,.55)}
+.card h3{margin:4px 0 8px 0;font-size:1.08rem}
+
+
+.muted{color:var(--muted)}
+input, select, textarea{width:100%;padding:12px;border-radius:14px;background:var(--surface);border:1px solid rgba(148,163,184,.22);color:var(--text);outline:none;transition:border-color .2s ease, box-shadow .2s ease}
+input:focus, select:focus, textarea:focus{border-color:var(--brand-2);box-shadow:0 0 0 4px var(--ring)}
+textarea{min-height:90px}
+.field{display:grid;gap:6px;margin:10px 0}
+.row{display:flex;gap:8px}
+.row > *{flex:1}
+.tag{display:inline-flex;align-items:center;padding:6px 10px;border-radius:999px;border:1px solid rgba(148,163,184,.2);font-size:.85rem}
+.status{font-weight:800;letter-spacing:.2px}
+.status.todo{color:var(--bad)}
+.status.doing{color:var(--warn)}
+.status.done{color:var(--ok)}
+.list{display:grid;gap:10px}
+.item{display:flex;align-items:center;gap:10px;justify-content:space-between;padding:10px;border:1px dashed rgba(148,163,184,.25);border-radius:14px}
+.qty{font-weight:800}
+.chip{padding:8px 10px;border-radius:999px;background:rgba(56,189,248,.18);border:1px solid rgba(56,189,248,.4);font-weight:700}
+.danger{color:#fecaca}
+.divider{height:1px;background:linear-gradient(90deg,transparent,rgba(148,163,184,.25),transparent);margin:10px 0}
+footer{opacity:.7;font-size:.9rem;text-align:center;padding:86px 0 20px}
+
+
+/* Screens + page transitions */
+section[id^="screen-"]{transform:translateX(20px);opacity:.0;transition:transform .25s ease, opacity .25s ease;display:none}
+section[id^="screen-"].active{display:block;transform:translateX(0);opacity:1}
+
+
+/* Bottom Tabbar */
+.tabbar{position:fixed;left:0;right:0;bottom:0;z-index:40;background:rgba(7,17,31,.75);backdrop-filter:blur(12px);border-top:1px solid rgba(148,163,184,.14)}
+.tabs{max-width:820px;margin:0 auto;padding:10px;display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+.tab{display:flex;flex-direction:column;align-items:center;gap:6px;padding:10px;border-radius:14px;border:1px solid transparent;text-align:center;font-size:.78rem;opacity:.9}
+.tab.active{border-color:rgba(34,211,238,.45);background:linear-gradient(180deg,rgba(34,211,238,.10),rgba(34,211,238,.05))}
+</style>
 </head>
 <body>
-  <header>
-    <div class="container nav">
-      <div class="brand"><div class="logo"></div> La Plage — Intranet</div>
-      <div id="rolePill" class="pill hidden"></div>
-      <div class="spacer"></div>
-      <button id="signinBtn" class="btn primary">Connexion Google</button>
-      <button id="signoutBtn" class="btn ghost hidden">Se déconnecter</button>
-    </div>
-  </header>
+<header>
+<div class="container nav">
+<div class="brand"><div class="logo"></div> La Plage — Intranet</div>
+<button id="backBtn" class="back">⟵ Retour</button>
+<div id="rolePill" class="pill hidden"></div> La Plage — Intranet</div>
+<div id="rolePill" class="pill hidden"></div>
+<div class="spacer"></div>
+<button id="signinBtn" class="btn primary">Connexion Google</button>
+<button id="signoutBtn" class="btn ghost hidden">Se déconnecter</button>
+</div>
+</header>
 
-  <main class="container">
-    <!-- DASHBOARD -->
-    <section id="screen-dashboard" class="grid cards hidden">
-      <div class="card">
-        <h3>Bienvenue 👋</h3>
-        <p class="muted">Sélectionnez une section ci‑dessous. Votre rôle : <span id="roleLabel">—</span></p>
-        <div class="divider"></div>
-        <div id="quickLinks" class="grid cards"></div>
-      </div>
-      <div class="card">
-        <h3>Interventions récentes</h3>
-        <div id="recentInterventions" class="list"></div>
-      </div>
-    </section>
 
-    <!-- RECEPTION → créer interventions pour Technique -->
-    <section id="screen-reception" class="hidden">
-      <div class="card ring">
-        <h3>Nouvelle intervention (Technique)</h3>
-        <div class="field">
-          <label>N° Mobil‑home</label>
-          <input id="i_mh" placeholder="ex: B12" />
-        </div>
-        <div class="row">
-          <div class="field">
-            <label>Statut</label>
-            <select id="i_status">
-              <option value="todo">À faire</option>
-              <option value="doing">En cours</option>
-              <option value="done">Terminé</option>
-            </select>
-          </div>
-          <div class="field">
-            <label>Clients présents</label>
-            <select id="i_present">
-              <option value="oui">Oui</option>
-              <option value="non">Non</option>
-            </select>
-          </div>
-        </div>
-        <div class="row">
-          <div class="field">
-            <label>Client autorise l'intervention</label>
-            <select id="i_ok">
-              <option value="oui">Oui</option>
-              <option value="non">Non</option>
-            </select>
-          </div>
-          <div class="field">
-            <label>Assigné à</label>
-            <select id="i_team" disabled>
-              <option value="technique" selected>Technique</option>
-            </select>
-          </div>
-        </div>
-        <div class="field">
-          <label>Détail (si besoin)</label>
-          <textarea id="i_details" placeholder="Précisions…"></textarea>
-        </div>
-        <div class="row">
-          <button id="btnCreateInter" class="btn primary">Enregistrer</button>
-          <button id="btnClearInter" class="btn">Réinitialiser</button>
-        </div>
-      </div>
-      <div class="card">
-        <h3>Interventions ouvertes</h3>
-        <div id="receptionInterventions" class="list"></div>
-      </div>
-    </section>
-
-    <!-- TECHNIQUE → voir / valider -->
-    <section id="screen-tech" class="hidden">
-      <div class="card">
-        <h3>Interventions (Technique)</h3>
-        <div id="techInterventions" class="list"></div>
-      </div>
-    </section>
-
-    <!-- MENAGE → interventions d'info (en lecture seule) si besoin futur -->
-    <section id="screen-menage" class="hidden">
-      <div class="card">
-        <h3>Informations / tâches Ménage</h3>
-        <p class="muted">(À adapter si vous souhaitez des tickets spécifiques ménage)</p>
-        <div id="menageInfo" class="list"></div>
-      </div>
-    </section>
-
-    <!-- ADMIN → gestion des comptes / rôles -->
-    <section id="screen-admin" class="hidden">
-      <div class="card ring">
-        <h3>Gestion des rôles</h3>
-        <p class="muted">Attribuez un rôle aux salariés connectés au moins une fois. Les utilisateurs apparaissent automatiquement dans la liste ci‑dessous après leur première connexion.</p>
-        <div class="field">
-          <label>Filtrer par nom / email</label>
-          <input id="userSearch" placeholder="Rechercher…" />
-        </div>
-        <div id="userList" class="list"></div>
-      </div>
-    </section>
-
-    <!-- INVENTAIRES -->
-    <section id="screen-inventory-tech" class="hidden">
-      <div class="card ring">
-        <h3>Inventaire — Technique</h3>
-        <div class="row">
-          <input id="it_name" placeholder="Nouvel objet…"/>
-          <input id="it_qty" type="number" inputmode="numeric" placeholder="Qté"/>
-          <button id="it_add" class="btn primary small">Ajouter</button>
-        </div>
-        <div id="it_list" class="list" style="margin-top:10px"></div>
-      </div>
-    </section>
-
-    <section id="screen-inventory-menage" class="hidden">
-      <div class="card ring">
-        <h3>Inventaire — Ménage</h3>
-        <div class="row">
-          <input id="im_name" placeholder="Nouvel objet…"/>
-          <input id="im_qty" type="number" inputmode="numeric" placeholder="Qté"/>
-          <button id="im_add" class="btn primary small">Ajouter</button>
-        </div>
-        <div id="im_list" class="list" style="margin-top:10px"></div>
-      </div>
-    </section>
-
-    <!-- ACCESS DENIED -->
-    <section id="screen-denied" class="hidden">
-      <div class="card">
-        <h3>Accès restreint</h3>
-        <p class="muted">Demandez à l'administrateur de vous attribuer un rôle.</p>
-      </div>
-    </section>
-
-  </main>
-
-  <footer>
-    <div class="container">© <span id="year"></span> Camping La Plage — Accès équipes</div>
-  </footer>
-
-  <!-- Firebase (Compat SDK pour simplicité en fichier unique) -->
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
-
-  <script>
-    // 1) RENSEIGNEZ VOTRE CONFIG FIREBASE ICI
-    const firebaseConfig = {
-      apiKey: "AIzaSyDEVzQfz8loSf2HDzU_YcBvIgH1Fx9_fnw",
-      authDomain: "dashboard-v4-2ef47.firebaseapp.com",
-      projectId: "dashboard-v4-2ef47",
-      storageBucket: "dashboard-v4-2ef47.firebasestorage.app",
-      messagingSenderId: "179267988381",
-      appId: "1:179267988381:web:644c3a2dc713ed9bca1d74"
-    };
-
-    // 2) INIT
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.firestore();
-
-    // 3) UTILITES UI
-    const $ = (id)=>document.getElementById(id);
-    const show = (id)=>$(id).classList.remove('hidden');
-    const hide = (id)=>$(id).classList.add('hidden');
-    const fmtStatus = (s)=> s==='todo'?'<span class="status todo">À faire</span>':(s==='doing'?'<span class="status doing">En cours</span>':'<span class="status done">Terminé</span>');
-
-    const SCREENS = [
-      'screen-dashboard','screen-reception','screen-tech','screen-menage',
-      'screen-admin','screen-inventory-tech','screen-inventory-menage','screen-denied'
-    ];
-    function route(to){
-      SCREENS.forEach(hide); show(to);
-      window.scrollTo({top:0,behavior:'smooth'});
-    }
-
-    // 4) AUTH
-    $('signinBtn').onclick = async ()=>{
-      const provider = new firebase.auth.GoogleAuthProvider();
-      provider.setCustomParameters({ prompt: 'select_account' });
-      await auth.signInWithPopup(provider);
-    };
-    $('signoutBtn').onclick = ()=> auth.signOut();
-
-    let currentUser = null; let currentRole = null; let unsubInter=null, unsubTech=null, unsubIT=null, unsubIM=null, unsubUsers=null;
-
-    auth.onAuthStateChanged(async (user)=>{
-      currentUser = user || null;
-      if(!user){
-        hide('signoutBtn'); show('signinBtn'); hide('rolePill'); route('screen-dashboard');
-        $('roleLabel').textContent = '—'; $('quickLinks').innerHTML=''; $('recentInterventions').innerHTML='';
-        // stop listeners
-        [unsubInter,unsubTech,unsubIT,unsubIM,unsubUsers].forEach(u=>u && u());
-        return;
-      }
-
-      show('signoutBtn'); hide('signinBtn');
-
-      // Créer/MAJ profil public minimal pour admin listing
-      const profRef = db.collection('users').doc(user.uid);
-      await profRef.set({
-        uid:user.uid, displayName:user.displayName || '', email:user.email || '', photoURL:user.photoURL || '',
-        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-      }, {merge:true});
-
-      // Charger rôle
-      const roleDoc = await db.collection('roles').doc(user.uid).get();
-      currentRole = roleDoc.exists ? roleDoc.data().role : null;
-
-      $('roleLabel').textContent = currentRole || 'non défini';
-      $('rolePill').textContent = (user.displayName||user.email) + (currentRole? ' — '+currentRole.toUpperCase() : ' — rôle à attribuer');
-      show('rolePill');
-
-      buildDashboard();
-      wireRealtime();
-    });
-
-    // 5) DASHBOARD LINKS SELON ROLE
-    function buildDashboard(){
-      const links = [];
-      if(!currentUser){ route('screen-dashboard'); return; }
-      if(currentRole==='admin'){
-        links.push({t:'Administration',scr:'screen-admin'});
-        links.push({t:'Réception — Interventions',scr:'screen-reception'});
-        links.push({t:'Technique — Interventions',scr:'screen-tech'});
-        links.push({t:'Inventaire Technique',scr:'screen-inventory-tech'});
-        links.push({t:'Inventaire Ménage',scr:'screen-inventory-menage'});
-      } else if(currentRole==='reception'){
-        links.push({t:'Réception — Interventions',scr:'screen-reception'});
-      } else if(currentRole==='technique'){
-        links.push({t:'Technique — Interventions',scr:'screen-tech'});
-        links.push({t:'Inventaire Technique',scr:'screen-inventory-tech'});
-      } else if(currentRole==='menage'){
-        links.push({t:'Ménage — Tableau',scr:'screen-menage'});
-        links.push({t:'Inventaire Ménage',scr:'screen-inventory-menage'});
-      } else {
-        links.push({t:"Accès restreint — contacter l'admin", scr:'screen-denied'});
-      }
-      $('quickLinks').innerHTML = links.map(l=>`<a class="btn" data-goto="${l.scr}">${l.t}</a>`).join('');
-      Array.from(document.querySelectorAll('[data-goto]')).forEach(a=>a.onclick=()=>route(a.dataset.goto));
-      route('screen-dashboard');
-    }
-
-    // 6) RECHERCHE & LISTENERS TEMPS RÉEL
-    function wireRealtime(){
-      // Interventions récentes pour dashboard
-      unsubInter && unsubInter();
-      unsubInter = db.collection('interventions').orderBy('createdAt','desc').limit(10)
-        .onSnapshot(snap=>{
-          $('recentInterventions').innerHTML = snap.empty? '<span class="muted">Aucune intervention</span>' :
-            snap.docs.map(d=>renderInterCard(d.data(), d.id, {compact:true})).join('');
-        });
-
-      // Réception — liste interventions ouvertes
-      unsubTech && unsubTech();
-      unsubTech = db.collection('interventions').where('team','==','technique').orderBy('createdAt','desc')
-        .onSnapshot(snap=>{
-          $('receptionInterventions').innerHTML = snap.empty? '<span class="muted">—</span>' :
-            snap.docs.map(d=>renderInterCard(d.data(), d.id, {showReception:true})).join('');
-          bindInterButtons();
-        });
-
-      // Inventaire Technique
-      unsubIT && unsubIT();
-      unsubIT = db.collection('inventaires').doc('technique').collection('items').orderBy('name')
-        .onSnapshot(snap=>{
-          $('it_list').innerHTML = snap.empty? '<span class="muted">Aucun objet</span>' :
-            snap.docs.map(doc=>renderInvItem(doc.id, doc.data(), 'technique')).join('');
-          bindInvButtons('technique');
-        });
-
-      // Inventaire Ménage
-      unsubIM && unsubIM();
-      unsubIM = db.collection('inventaires').doc('menage').collection('items').orderBy('name')
-        .onSnapshot(snap=>{
-          $('im_list').innerHTML = snap.empty? '<span class="muted">Aucun objet</span>' :
-            snap.docs.map(doc=>renderInvItem(doc.id, doc.data(), 'menage')).join('');
-          bindInvButtons('menage');
-        });
-
-      // Admin — liste utilisateurs
-      unsubUsers && unsubUsers();
-      unsubUsers = db.collection('users').orderBy('displayName')
-        .onSnapshot(snap=>{
-          const q = ($('userSearch').value||'').toLowerCase();
-          const rows = [];
-          snap.forEach(doc=>{
-            const u=doc.data();
-            if(q && !(u.displayName||'').toLowerCase().includes(q) && !(u.email||'').toLowerCase().includes(q)) return;
-            rows.push(u);
-          });
-          renderUserList(rows);
-        });
-    }
-
-    // 7) CREATION INTERVENTION (réception)
-    $('btnCreateInter').onclick = async ()=>{
-      if(!currentUser) return alert('Connectez‑vous');
-      if(!(currentRole==='reception' || currentRole==='admin')) return alert('Accès réception requis');
-      const data = {
-        mh: $('i_mh').value.trim(),
-        status: $('i_status').value,
-        present: $('i_present').value==='oui',
-        authorize: $('i_ok').value==='oui',
-        details: $('i_details').value.trim(),
-        team: 'technique',
-        createdBy: {uid: currentUser.uid, name: currentUser.displayName || currentUser.email},
-        validatedBy: null,
-        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-      };
-      if(!data.mh) return alert('N° Mobil‑home requis');
-      await db.collection('interventions').add(data);
-      ['i_mh','i_details'].forEach(id=>$(id).value='');
-      $('i_status').value='todo'; $('i_present').value='oui'; $('i_ok').value='oui';
-      alert('Intervention enregistrée');
-    };
-    $('btnClearInter').onclick = ()=>{ ['i_mh','i_details'].forEach(id=>$(id).value=''); };
-
-    // 8) INVENTAIRE handlers
-    $('it_add').onclick = ()=> addInv('technique', $('it_name').value, Number($('it_qty').value||0));
-    $('im_add').onclick = ()=> addInv('menage', $('im_name').value, Number($('im_qty').value||0));
-
-    async function addInv(team, name, qty){
-      if(!currentUser) return alert('Connectez‑vous');
-      if(!(currentRole===team || currentRole==='admin')) return alert('Accès '+team+' requis');
-      name = (name||'').trim(); if(!name) return alert('Nom requis');
-      qty = isNaN(qty)?0:qty;
-      const ref = db.collection('inventaires').doc(team).collection('items').doc(name.toLowerCase());
-      await db.runTransaction(async (t)=>{
-        const snap = await t.get(ref);
-        const cur = snap.exists? (snap.data().qty||0) : 0;
-        t.set(ref, {name, qty: cur + qty, updatedAt: firebase.firestore.FieldValue.serverTimestamp()}, {merge:true});
-      });
-      if(team==='technique'){ $('it_name').value=''; $('it_qty').value=''; } else { $('im_name').value=''; $('im_qty').value=''; }
-    }
-
-    function bindInvButtons(team){
-      document.querySelectorAll(`[data-inv-action][data-team="${team}"]`).forEach(btn=>{
-        btn.onclick = async ()=>{
-          if(!(currentRole===team || currentRole==='admin')) return alert('Accès '+team+' requis');
-          const id = btn.dataset.id; const act = btn.dataset.invAction;
-          const ref = db.collection('inventaires').doc(team).collection('items').doc(id);
-          if(act==='del'){
-            const ok = confirm('Supprimer cet objet ?'); if(!ok) return;
-            await ref.delete();
-          } else {
-            const delta = act==='plus'? 1 : -1;
-            await db.runTransaction(async (t)=>{
-              const snap = await t.get(ref);
-              if(!snap.exists) return;
-              let q = (snap.data().qty||0) + delta; if(q<0) q=0;
-              t.update(ref,{qty:q, updatedAt: firebase.firestore.FieldValue.serverTimestamp()});
-            });
-          }
-        }
-      })
-    }
-
-    function renderInvItem(id, d, team){
-      return `<div class="item">
-        <div><div style="font-weight:600">${d.name}</div><div class="muted">ID: ${id}</div></div>
-        <div class="row" style="justify-content:flex-end;gap:6px;align-items:center">
-          <span class="qty">${d.qty||0}</span>
-          <button class="btn small" data-team="${team}" data-id="${id}" data-inv-action="minus">−</button>
-          <button class="btn small" data-team="${team}" data-id="${id}" data-inv-action="plus">+</button>
-          <button class="btn small danger" data-team="${team}" data-id="${id}" data-inv-action="del">Supprimer</button>
-        </div>
-      </div>`;
-    }
-
-    // 9) INTERVENTIONS render & actions
-    function renderInterCard(d, id, {compact=false, showReception=false}={}){
-      const who = d.validatedBy? `<span class="chip">Validé par ${d.validatedBy.name}</span>` : '';
-      return `<div class="card">
-        <h3>MH ${d.mh} — ${fmtStatus(d.status)}</h3>
-        <div class="muted">Créé par ${d.createdBy?.name||'—'} • ${d.team==='technique'?'Technique':''}</div>
-        ${d.details? `<p style="margin:8px 0">${d.details}</p>`:''}
-        <div class="row">
-          <span class="tag">Clients présents: ${d.present?'Oui':'Non'}</span>
-          <span class="tag">Autorisation: ${d.authorize?'Oui':'Non'}</span>
-          ${who}
-        </div>
-        <div class="row" style="margin-top:10px">
-          ${compact? '' : actionButtons(d,id,showReception)}
-        </div>
-      </div>`
-    }
-
-    function actionButtons(d, id, showReception){
-      const btns = [];
-      // Réception peut changer le statut rapidement
-      if(showReception && (currentRole==='reception' || currentRole==='admin')){
-        ['todo','doing','done'].forEach(s=>{
-          btns.push(`<button class="btn small" data-inter-act="status" data-id="${id}" data-val="${s}">${s==='todo'?'À faire':(s==='doing'?'En cours':'Terminé')}</button>`);
-        });
-      }
-      // Technique peut valider/mettre à jour
-      if(currentRole==='technique' || currentRole==='admin'){
-        btns.push(`<button class="btn small" data-inter-act="take" data-id="${id}">Valider (je prends)</button>`);
-        ['todo','doing','done'].forEach(s=>{
-          btns.push(`<button class="btn small" data-inter-act="status" data-id="${id}" data-val="${s}">${s==='todo'?'À faire':(s==='doing'?'En cours':'Terminé')}</button>`);
-        });
-      }
-      return btns.join(' ');
-    }
-
-    function bindInterButtons(){
-      document.querySelectorAll('[data-inter-act]').forEach(btn=>{
-        btn.onclick = async ()=>{
-          const id = btn.dataset.id; const act = btn.dataset.interAct; const ref = db.collection('interventions').doc(id);
-          const snap = await ref.get(); if(!snap.exists) return; const d=snap.data();
-          if(act==='take'){
-            if(!(currentRole==='technique' || currentRole==='admin')) return alert('Réservé à la technique');
-            await ref.update({validatedBy:{uid: currentUser.uid, name: currentUser.displayName||currentUser.email}, updatedAt: firebase.firestore.FieldValue.serverTimestamp()});
-          }
-          if(act==='status'){
-            const val = btn.dataset.val;
-            // Réception OU Technique OU Admin
-            if(!(currentRole==='reception' || currentRole==='technique' || currentRole==='admin')) return alert('Accès requis');
-            await ref.update({status: val, updatedAt: firebase.firestore.FieldValue.serverTimestamp()});
-          }
-        }
-      })
-    }
-
-    // 10) TECH VIEW: même source que réception mais rendue sans boutons réception
-    db.collection('interventions').where('team','==','technique').orderBy('createdAt','desc')
-      .onSnapshot(snap=>{
-        $('techInterventions').innerHTML = snap.empty? '<span class="muted">Aucune</span>' :
-          snap.docs.map(d=>renderInterCard(d.data(), d.id)).join('');
-        bindInterButtons();
-      });
-
-    // 11) ADMIN — rendering users + set roles
-    $('userSearch').oninput = ()=> wireRealtime();
-
-    function renderUserList(users){
-      $('userList').innerHTML = users.map(u=>{
-        const id = u.uid;
-        return `<div class="item">
-          <div>
-            <div style="font-weight:600">${u.displayName||'—'}</div>
-            <div class="muted">${u.email||''}</div>
-          </div>
-          <div class="row" style="align-items:center;gap:6px">
-            <select id="role_${id}">
-              <option value="">— rôle —</option>
-              <option value="admin">admin</option>
-              <option value="reception">reception</option>
-              <option value="technique">technique</option>
-              <option value="menage">menage</option>
-            </select>
-            <button class="btn small" data-role-save="${id}">Enregistrer</button>
-          </div>
-        </div>`
-      }).join('');
-      // Prefill existing roles
-      users.forEach(async (u)=>{
-        const r = await db.collection('roles').doc(u.uid).get();
-        if(r.exists){ const v=r.data().role; const el=$('role_'+u.uid); if(el) el.value=v; }
-      });
-      // Save handlers
-      document.querySelectorAll('[data-role-save]').forEach(btn=>{
-        btn.onclick = async ()=>{
-          if(!(currentRole==='admin')) return alert('Accès admin requis');
-          const uid = btn.dataset.roleSave; const role = $('role_'+uid).value;
-          if(!role) return alert('Choisissez un rôle');
-          await db.collection('roles').doc(uid).set({role, updatedAt: firebase.firestore.FieldValue.serverTimestamp()});
-          alert('Rôle enregistré');
-        }
-      })
-    }
-
-    // 12) Footer year
-    $('year').textContent = new Date().getFullYear();
-
-    // 13) Navigation rapide via hash (facultatif)
-    window.addEventListener('hashchange',()=>{
-      const h = location.hash.replace('#','');
-      if(SCREENS.includes(h)) route(h);
-    });
-  </script>
-
-  <!-- ===== NOTES DE CONFIG FIREBASE / RÈGLES SÉCURITÉ (copiez dans Firestore Rules) =====
-
-  rules_version = '2';
-  service cloud.firestore {
-    match /databases/{database}/documents {
-      function hasRole(r) {
-        return exists(/databases/$(database)/documents/roles/$(request.auth.uid)) &&
-               get(/databases/$(database)/documents/roles/$(request.auth.uid)).data.role == r;
-      }
-      function isAdmin(){ return hasRole('admin'); }
-
-      // Profils publics (lecture restreinte aux connectés, écriture par l'utilisateur lui‑même)
-      match /users/{uid} {
-        allow read: if request.auth != null; 
-        allow write: if request.auth != null && request.auth.uid == uid;
-      }
-
-      // Rôles: MAJ seulement par admin (à créer manuellement pour le 1er admin)
-      match /roles/{uid} {
-        allow read: if request.auth != null; 
-        allow write: if isAdmin();
-      }
-
-      // Interventions: lecture par connectés; création par admin & réception; MAJ par admin, réception, technique
-      match /interventions/{id} {
-        allow read: if request.auth != null;
-        allow create: if request.auth != null && (isAdmin() || hasRole('reception'));
-        allow update, delete: if request.auth != null && (isAdmin() || hasRole('reception') || hasRole('technique'));
-      }
-
-      // Inventaires
-      match /inventaires/{team}/items/{itemId} {
-        allow read: if request.auth != null;
-        allow create, update, delete: if request.auth != null && (isAdmin() || hasRole(team));
-      }
-    }
-  }
-
-  PROCÉDURE D'INITIALISATION RAPIDE:
-  1) Créez un projet Firebase → activez Authentication (Google) et Firestore en mode sécurisé (règles ci‑dessus).
-  2) Dans Authentication > Paramètres, ajoutez votre domaine GitHub Pages (ex: votrecompte.github.io) comme domaine autorisé.
-  3) Copiez la configuration (apiKey, authDomain, projectId, etc.) dans firebaseConfig ci‑dessus.
-  4) Dans Firestore, créez manuellement le 1er admin: collection "roles", doc = UID de votre compte Google, champ role = "admin".
-  5) Poussez ce fichier index.html sur un repo GitHub et activez GitHub Pages (branch main, /root). Accédez à l'URL publique.
-
-  ASTUCES:
-  - Tout est mobile‑first. Ajoutez à l'occasion sur desktop des colonnes supplémentaires.
-  - Vous pouvez dupliquer la page Ménage pour des tickets dédiés ménage si besoin.
-  - Sauvegardez/partagez le lien direct avec des ancres (#screen-tech, etc.) si vous voulez créer des favoris par équipe.
-  - Pour des exports ou historiques avancés, envisagez un Google Sheet relié via Cloud Functions (optionnel).
-
-  -->
+<main class="container">
+<!-- DASHBOARD -->
+<section id="screen-dashboard" class="grid cards hidden">
+<div class="card">
+<h3>Bienvenue 👋</h3>
+<p class="muted">Sélectionnez une section ci‑dessous. Votre rôle : <span id="roleLabel">—</span></p>
+<div class="divider"></div>
+<div id="quickLinks" class="grid cards"></div>
+</div>
+<div class="card">
+</script>
 </body>
-
 </html>
+
