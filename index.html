@@ -427,184 +427,116 @@
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
 
   <script>
-    // 1) CONFIG FIREBASE (la tienne)
-    const firebaseConfig = {
-      apiKey: "AIzaSyDEVzQfz8loSf2HDzU_YcBvIgH1Fx9_fnw",
-      authDomain: "dashboard-v4-2ef47.firebaseapp.com",
-      projectId: "dashboard-v4-2ef47",
-      storageBucket: "dashboard-v4-2ef47.firebasestorage.app",
-      messagingSenderId: "179267988381",
-      appId: "1:179267988381:web:644c3a2dc713ed9bca1d74"
-    };
+  // --- Config
+  const firebaseConfig = {
+    apiKey: "AIzaSyDEVzQfz8loSf2HDzU_YcBvIgH1Fx9_fnw",
+    authDomain: "dashboard-v4-2ef47.firebaseapp.com",
+    projectId: "dashboard-v4-2ef47",
+    storageBucket: "dashboard-v4-2ef47.firebasestorage.app",
+    messagingSenderId: "179267988381",
+    appId: "1:179267988381:web:644c3a2dc713ed9bca1d74"
+  };
 
-    // 2) INIT
-    firebase.initializeApp(firebaseConfig);
-    // Persistance locale (évite les boucles sur iOS/Safari et iframe)
-auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
-  .catch(e => console.warn('[auth] setPersistence:', e));
+  // Références (évite la TDZ des const)
+  let auth, db, currentUser = null, currentRole = null;
+  let unsubInter=null, unsubTech=null, unsubTechView=null, unsubIT=null, unsubIM=null, unsubUsers=null;
 
-// Si fallback redirect a eu lieu, capture l’éventuelle erreur
-auth.getRedirectResult().catch(e => {
-  console.error('[auth] redirect result:', e.code, e.message);
-});
+  const $ = (id)=>document.getElementById(id);
 
-    const auth = firebase.auth();
-    const db = firebase.firestore();
-
-    // 3) UTILITES UI
-    const $ = (id)=>document.getElementById(id);
-    const fmtStatus = (s)=> s==='todo'?'<span class="status todo">À faire</span>':(s==='doing'?'<span class="status doing">En cours</span>':'<span class="status done">Terminé</span>');
-
-const SCREENS = [
-  'screen-login', // <— nouvel écran
-  'screen-dashboard','screen-reception','screen-tech','screen-menage',
-  'screen-admin','screen-inventory-tech','screen-inventory-menage','screen-denied'
-];
-
-
-    // Router avec transitions + historique
-    const historyStack = [];
-    function route(to){
-      SCREENS.forEach(id=>{
-        const el=$(id);
-        el.classList.remove('active');
-        el.style.display='none';
-      });
-      const next=$(to);
-      next.style.display='block';
-      requestAnimationFrame(()=>next.classList.add('active'));
-      window.scrollTo({top:0,behavior:'smooth'});
-      if(historyStack[historyStack.length-1]!==to){ historyStack.push(to); }
-      updateBack();
+  function initFirebaseOnce() {
+    if (!firebase.apps || !firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig);
     }
-    function goBack(){
-      historyStack.pop();
-      const prev = historyStack.pop() || 'screen-dashboard';
-      route(prev);
-      selectTab(prev);
-    }
-    $('backBtn').onclick = goBack;
-    function updateBack(){ $('backBtn').classList.toggle('show', historyStack.length>1); }
+    auth = firebase.auth();
+    db   = firebase.firestore();
+  }
 
-    function selectTab(scr){
-      document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('active', x.dataset.tab===scr));
-    }
-
-    // 4) AUTH
-// Connexion Google: popup + fallback redirect si bloqué
-async function doGoogleSignIn(){
-  const provider = new firebase.auth.GoogleAuthProvider();
-  provider.setCustomParameters({ prompt: 'select_account' });
-  try {
-    console.log('[auth] try popup');
-    await auth.signInWithPopup(provider);
-  } catch (err) {
-    console.error('[auth] popup failed:', err.code, err.message);
-    if ([
-      'auth/popup-blocked',
-      'auth/cancelled-popup-request',
-      'auth/operation-not-supported-in-this-environment'
-    ].includes(err.code)) {
-      console.log('[auth] fallback to redirect');
-      await auth.signInWithRedirect(provider);
-    } else {
-      alert('Connexion impossible : ' + (err.message || err.code));
+  async function doGoogleSignIn(e){
+    if (e) { e.preventDefault(); e.stopPropagation(); }
+    const provider = new firebase.auth.GoogleAuthProvider();
+    provider.setCustomParameters({ prompt: 'select_account' });
+    try {
+      await auth.signInWithPopup(provider);
+    } catch (err) {
+      if (['auth/popup-blocked','auth/cancelled-popup-request','auth/operation-not-supported-in-this-environment'].includes(err.code)) {
+        await auth.signInWithRedirect(provider);
+      } else {
+        alert('Connexion impossible : ' + (err.message || err.code));
+      }
     }
   }
-}
 
-// relier proprement les deux boutons et bloquer toute propagation
-['signinBtn','signinBig'].forEach(id=>{
-  const el = document.getElementById(id);
-  if (el) el.addEventListener('click', (e)=>{
-    e.preventDefault();
-    e.stopPropagation();
-    doGoogleSignIn();
+  // ==== Tout démarre ici, une fois le DOM prêt
+  document.addEventListener('DOMContentLoaded', () => {
+    initFirebaseOnce();               // <-- auth et db sont prêts ici
+
+    // Brancher les boutons maintenant que doGoogleSignIn peut utiliser auth
+    ['signinBtn','signinBig'].forEach(id=>{
+      const el = $(id);
+      if (el) el.addEventListener('click', doGoogleSignIn);
+    });
+
+    // ---- Observer la session (utilise auth après init)
+    auth.onAuthStateChanged(async (user) => {
+      currentUser = user || null;
+
+      if (!user) {
+        // Stopper écoutes / reset UI
+        [unsubInter,unsubTech,unsubTechView,unsubIT,unsubIM,unsubUsers].forEach(u=>u && u());
+        unsubInter=unsubTech=unsubTechView=unsubIT=unsubIM=unsubUsers=null;
+
+        currentRole = null;
+        $('signoutBtn')?.classList.add('hidden');
+        $('signinBtn')?.classList.remove('hidden');
+        $('rolePill')?.classList.add('hidden');
+        const rp = $('rolePill'); if (rp) rp.textContent='';
+        const rl = $('roleLabel'); if (rl) rl.textContent='—';
+        const ql = $('quickLinks'); if (ql) ql.innerHTML='';
+        const ri = $('recentInterventions'); if (ri) ri.innerHTML='';
+        $('tabbar')?.classList.add('hidden');
+
+        const hdr = $('appHeader'); if (hdr) hdr.style.display='none';
+        const big = $('signinBig'); if (big) big.onclick = doGoogleSignIn;
+
+        route('screen-login');
+        return;
+      }
+
+      // Connecté
+      const hdr = $('appHeader'); if (hdr) hdr.style.display='';
+      $('signoutBtn')?.classList.remove('hidden');
+      $('signinBtn')?.classList.add('hidden');
+
+      // Profil (tolère l’échec)
+      try {
+        await db.collection('users').doc(user.uid).set({
+          uid:user.uid,
+          displayName:user.displayName || '',
+          email:user.email || '',
+          photoURL:user.photoURL || '',
+          updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        }, { merge:true });
+      } catch(e){ console.warn('[users.set]', e); }
+
+      // Rôle (tolère l’échec)
+      try {
+        const roleSnap = await db.collection('roles').doc(user.uid).get();
+        currentRole = roleSnap.exists ? (roleSnap.data().role || null) : null;
+      } catch(e){ console.warn('[roles.get]', e); currentRole = null; }
+
+      const rl = $('roleLabel'); if (rl) rl.textContent = currentRole || 'non défini';
+      const pill = $('rolePill');
+      if (pill) {
+        pill.textContent = (user.displayName||user.email) + (currentRole ? ' — ' + currentRole.toUpperCase() : ' — rôle à attribuer');
+        pill.classList.remove('hidden');
+      }
+
+      try { buildDashboard(); wireRealtime(); }
+      catch(e){ console.warn('[wireRealtime]', e); }
+
+      route('screen-dashboard');
+    });
   });
-});
-
-
-
-let currentUser = null; let currentRole = null;
-let unsubInter=null, unsubTech=null, unsubTechView=null, unsubIT=null, unsubIM=null, unsubUsers=null;
-
-
-auth.onAuthStateChanged(async (user) => {
-  currentUser = user || null;
-
-  // ====== DÉCONNECTÉ ======
-  if (!user) {
-    // Stopper les écoutes temps réel
-    [unsubInter, unsubTech, unsubTechView, unsubIT, unsubIM, unsubUsers].forEach(u => u && u());
-    unsubInter = unsubTech = unsubTechView = unsubIT = unsubIM = unsubUsers = null;
-
-    // Reset UI
-    currentRole = null;
-    $('signoutBtn').classList.add('hidden');
-    $('signinBtn').classList.remove('hidden');
-    $('rolePill').classList.add('hidden');
-    $('rolePill').textContent = '';
-    $('roleLabel').textContent = '—';
-    $('quickLinks').innerHTML = '';
-    $('recentInterventions').innerHTML = '';
-    $('tabbar').classList.add('hidden');
-
-    // Masquer le header sur l'écran de connexion
-    const hdr = document.getElementById('appHeader');
-    if (hdr) hdr.style.display = 'none';
-
-    // S'assurer que le gros bouton est branché
-    const big = document.getElementById('signinBig');
-    if (big) big.onclick = doGoogleSignIn;
-
-    route('screen-login');
-    return;
-  }
-
-  // ====== CONNECTÉ ======
-  // Afficher le header et les bons boutons
-  const hdr = document.getElementById('appHeader');
-  if (hdr) hdr.style.display = '';
-  $('signoutBtn').classList.remove('hidden');
-  $('signinBtn').classList.add('hidden');
-
-  // 1) Profil minimal (tolère l’échec)
-  try {
-    const profRef = db.collection('users').doc(user.uid);
-    await profRef.set({
-      uid: user.uid,
-      displayName: user.displayName || '',
-      email: user.email || '',
-      photoURL: user.photoURL || '',
-      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-    }, { merge: true });
-  } catch (e) {
-    console.warn('[firestore] users.set refusé:', e);
-  }
-
-  // 2) Rôle (tolère l’échec)
-  try {
-    const roleSnap = await db.collection('roles').doc(user.uid).get();
-    currentRole = roleSnap.exists ? (roleSnap.data().role || null) : null;
-  } catch (e) {
-    console.warn('[firestore] roles.get refusé:', e);
-    currentRole = null;
-  }
-
-  // 3) UI rôle
-  $('roleLabel').textContent = currentRole || 'non défini';
-  $('rolePill').textContent =
-    (user.displayName || user.email) +
-    (currentRole ? ' — ' + currentRole.toUpperCase() : ' — rôle à attribuer');
-  $('rolePill').classList.remove('hidden');
-
-  // 4) Construire l’UI + temps réel (tolère l’échec)
-  try { buildDashboard(); wireRealtime(); }
-  catch (e) { console.warn('[wireRealtime] refusé:', e); }
-
-  // 5) Aller à l’accueil
-  route('screen-dashboard');
-});
 
     // 5) DASHBOARD + onglets bas selon rôle
     function buildDashboard(){
