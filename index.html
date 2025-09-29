@@ -231,7 +231,7 @@
     <div class="login-card fancy">
 <div class="login-top">
   <!-- Mets le logo dans ton repo et ajuste le chemin si besoin -->
-  <img class="logo-img" src="assets/logo-camping-la-plage.png" alt="Camping La Plage — Argelès-sur-Mer" />
+  <img class="logo-img" src="logo-camping-la-plage.png" alt="Camping La Plage — Argelès-sur-Mer" />
   <div class="login-titles">
     <div class="mini muted">Camping</div>
     <h1>La Plage <span class="accent">Dashboard</span></h1>
@@ -490,15 +490,32 @@ const SCREENS = [
     }
 
     // 4) AUTH
-// remplace l'ancien $('signinBtn').onclick = async ()=>{ ... } par :
-// Connexion Google réutilisable
+// Connexion Google: popup + fallback redirect si bloqué
 async function doGoogleSignIn(){
   const provider = new firebase.auth.GoogleAuthProvider();
   provider.setCustomParameters({ prompt: 'select_account' });
-  await auth.signInWithPopup(provider);
+  try {
+    console.log('[auth] try popup');
+    await auth.signInWithPopup(provider);
+  } catch (err) {
+    console.error('[auth] popup failed:', err.code, err.message);
+    if ([
+      'auth/popup-blocked',
+      'auth/cancelled-popup-request',
+      'auth/operation-not-supported-in-this-environment'
+    ].includes(err.code)) {
+      console.log('[auth] fallback to redirect');
+      await auth.signInWithRedirect(provider);
+    } else {
+      alert('Connexion impossible : ' + (err.message || err.code));
+    }
+  }
 }
+
+// relier les deux boutons
 $('signinBtn').onclick = doGoogleSignIn;
 document.getElementById('signinBig')?.addEventListener('click', doGoogleSignIn);
+
 
 let currentUser = null; let currentRole = null;
 let unsubInter=null, unsubTech=null, unsubTechView=null, unsubIT=null, unsubIM=null, unsubUsers=null;
@@ -830,15 +847,6 @@ function wireRealtime(){
         }
       })
     }
-
-    // Vue Technique en temps réel
-    db.collection('interventions').where('team','==','technique').orderBy('createdAt','desc')
-      .onSnapshot(snap=>{
-        $('techInterventions').innerHTML = snap.empty? '<span class="muted">Aucune</span>' :
-          snap.docs.map(d=>renderInterCard(d.data(), d.id)).join('');
-        bindInterButtons();
-      });
-
     // Admin
     $('userSearch').oninput = ()=> wireRealtime();
 
