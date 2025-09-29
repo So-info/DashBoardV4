@@ -439,6 +439,15 @@
 
     // 2) INIT
     firebase.initializeApp(firebaseConfig);
+    // Persistance locale (évite les boucles sur iOS/Safari et iframe)
+auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
+  .catch(e => console.warn('[auth] setPersistence:', e));
+
+// Si fallback redirect a eu lieu, capture l’éventuelle erreur
+auth.getRedirectResult().catch(e => {
+  console.error('[auth] redirect result:', e.code, e.message);
+});
+
     const auth = firebase.auth();
     const db = firebase.firestore();
 
@@ -520,63 +529,80 @@ let currentUser = null; let currentRole = null;
 let unsubInter=null, unsubTech=null, unsubTechView=null, unsubIT=null, unsubIM=null, unsubUsers=null;
 
 
-auth.onAuthStateChanged(async (user)=>{
+auth.onAuthStateChanged(async (user) => {
   currentUser = user || null;
 
-  if(!user){
-    // reset UI
+  // ====== DÉCONNECTÉ ======
+  if (!user) {
+    // Stopper les écoutes temps réel
+    [unsubInter, unsubTech, unsubTechView, unsubIT, unsubIM, unsubUsers].forEach(u => u && u());
+    unsubInter = unsubTech = unsubTechView = unsubIT = unsubIM = unsubUsers = null;
+
+    // Reset UI
+    currentRole = null;
     $('signoutBtn').classList.add('hidden');
     $('signinBtn').classList.remove('hidden');
     $('rolePill').classList.add('hidden');
+    $('rolePill').textContent = '';
     $('roleLabel').textContent = '—';
-    $('quickLinks').innerHTML=''; 
-    $('recentInterventions').innerHTML='';
-[unsubInter,unsubTech,unsubTechView,unsubIT,unsubIM,unsubUsers].forEach(u=>u && u());
-
-
-    // CACHER le header sur la page de connexion
-    const hdr = document.getElementById('appHeader');
-    if(hdr) hdr.style.display = 'none';
-
-    // Aller sur la page login et brancher le gros bouton
-    route('screen-login');
+    $('quickLinks').innerHTML = '';
+    $('recentInterventions').innerHTML = '';
     $('tabbar').classList.add('hidden');
+
+    // Masquer le header sur l'écran de connexion
+    const hdr = document.getElementById('appHeader');
+    if (hdr) hdr.style.display = 'none';
+
+    // S'assurer que le gros bouton est branché
     const big = document.getElementById('signinBig');
-    if(big) big.onclick = doGoogleSignIn;
+    if (big) big.onclick = doGoogleSignIn;
+
+    route('screen-login');
     return;
   }
 
-  // ----- ICI: utilisateur connecté -----
-
-  // AFFICHER le header
+  // ====== CONNECTÉ ======
+  // Afficher le header et les bons boutons
   const hdr = document.getElementById('appHeader');
-  if(hdr) hdr.style.display = '';
-
+  if (hdr) hdr.style.display = '';
   $('signoutBtn').classList.remove('hidden');
   $('signinBtn').classList.add('hidden');
 
-  // Profil minimal pour la liste Admin
-  const profRef = db.collection('users').doc(user.uid);
-  await profRef.set({
-    uid:user.uid,
-    displayName:user.displayName || '',
-    email:user.email || '',
-    photoURL:user.photoURL || '',
-    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-  }, {merge:true});
+  // 1) Profil minimal (tolère l’échec)
+  try {
+    const profRef = db.collection('users').doc(user.uid);
+    await profRef.set({
+      uid: user.uid,
+      displayName: user.displayName || '',
+      email: user.email || '',
+      photoURL: user.photoURL || '',
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    }, { merge: true });
+  } catch (e) {
+    console.warn('[firestore] users.set refusé:', e);
+  }
 
-  // Rôle
-  const roleDoc = await db.collection('roles').doc(user.uid).get();
-  currentRole = roleDoc.exists ? roleDoc.data().role : null;
+  // 2) Rôle (tolère l’échec)
+  try {
+    const roleSnap = await db.collection('roles').doc(user.uid).get();
+    currentRole = roleSnap.exists ? (roleSnap.data().role || null) : null;
+  } catch (e) {
+    console.warn('[firestore] roles.get refusé:', e);
+    currentRole = null;
+  }
 
+  // 3) UI rôle
   $('roleLabel').textContent = currentRole || 'non défini';
-  $('rolePill').textContent = (user.displayName||user.email) + (currentRole ? ' — ' + currentRole.toUpperCase() : ' — rôle à attribuer');
+  $('rolePill').textContent =
+    (user.displayName || user.email) +
+    (currentRole ? ' — ' + currentRole.toUpperCase() : ' — rôle à attribuer');
   $('rolePill').classList.remove('hidden');
 
-  buildDashboard();
-  wireRealtime();
+  // 4) Construire l’UI + temps réel (tolère l’échec)
+  try { buildDashboard(); wireRealtime(); }
+  catch (e) { console.warn('[wireRealtime] refusé:', e); }
 
-  // Arriver sur l'accueil après login
+  // 5) Aller à l’accueil
   route('screen-dashboard');
 });
 
