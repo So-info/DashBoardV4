@@ -231,7 +231,7 @@
     <div class="login-card fancy">
 <div class="login-top">
   <!-- Mets le logo dans ton repo et ajuste le chemin si besoin -->
-  <img class="logo-img" src="logo-camping-la-plage.png" alt="Camping La Plage — Argelès-sur-Mer" />
+  <img class="logo-img" src="assets/logo-camping-la-plage.png" alt="Camping La Plage — Argelès-sur-Mer" />
   <div class="login-titles">
     <div class="mini muted">Camping</div>
     <h1>La Plage <span class="accent">Dashboard</span></h1>
@@ -498,9 +498,11 @@ async function doGoogleSignIn(){
   await auth.signInWithPopup(provider);
 }
 $('signinBtn').onclick = doGoogleSignIn;
+document.getElementById('signinBig')?.addEventListener('click', doGoogleSignIn);
 
 let currentUser = null; let currentRole = null;
-let unsubInter=null, unsubTech=null, unsubIT=null, unsubIM=null, unsubUsers=null;
+let unsubInter=null, unsubTech=null, unsubTechView=null, unsubIT=null, unsubIM=null, unsubUsers=null;
+
 
 auth.onAuthStateChanged(async (user)=>{
   currentUser = user || null;
@@ -513,7 +515,8 @@ auth.onAuthStateChanged(async (user)=>{
     $('roleLabel').textContent = '—';
     $('quickLinks').innerHTML=''; 
     $('recentInterventions').innerHTML='';
-    [unsubInter,unsubTech,unsubIT,unsubIM,unsubUsers].forEach(u=>u && u());
+[unsubInter,unsubTech,unsubTechView,unsubIT,unsubIM,unsubUsers].forEach(u=>u && u());
+
 
     // CACHER le header sur la page de connexion
     const hdr = document.getElementById('appHeader');
@@ -615,56 +618,71 @@ auth.onAuthStateChanged(async (user)=>{
     }
 
     // 6) TEMPS RÉEL
-    function wireRealtime(){
-      // Dashboard récents
-      unsubInter && unsubInter();
-      unsubInter = db.collection('interventions').orderBy('createdAt','desc').limit(10)
-        .onSnapshot(snap=>{
-          $('recentInterventions').innerHTML = snap.empty? '<span class="muted">Aucune intervention</span>' :
-            snap.docs.map(d=>renderInterCard(d.data(), d.id, {compact:true})).join('');
-        });
+function wireRealtime(){
+  // Dashboard — interventions récentes
+  unsubInter && unsubInter();
+  unsubInter = db.collection('interventions').orderBy('createdAt','desc').limit(10)
+    .onSnapshot(snap=>{
+      $('recentInterventions').innerHTML = snap.empty
+        ? '<span class="muted">Aucune intervention</span>'
+        : snap.docs.map(d=>renderInterCard(d.data(), d.id, {compact:true})).join('');
+    });
 
-      // Réception
-      unsubTech && unsubTech();
-      unsubTech = db.collection('interventions').where('team','==','technique').orderBy('createdAt','desc')
-        .onSnapshot(snap=>{
-          $('receptionInterventions').innerHTML = snap.empty? '<span class="muted">—</span>' :
-            snap.docs.map(d=>renderInterCard(d.data(), d.id, {showReception:true})).join('');
-          bindInterButtons();
-        });
+  // Réception — liste interventions (Technique)
+  unsubTech && unsubTech();
+  unsubTech = db.collection('interventions').where('team','==','technique').orderBy('createdAt','desc')
+    .onSnapshot(snap=>{
+      $('receptionInterventions').innerHTML = snap.empty
+        ? '<span class="muted">—</span>'
+        : snap.docs.map(d=>renderInterCard(d.data(), d.id, {showReception:true})).join('');
+      bindInterButtons();
+    });
 
-      // Inventaire Technique
-      unsubIT && unsubIT();
-      unsubIT = db.collection('inventaires').doc('technique').collection('items').orderBy('name')
-        .onSnapshot(snap=>{
-          $('it_list').innerHTML = snap.empty? '<span class="muted">Aucun objet</span>' :
-            snap.docs.map(doc=>renderInvItem(doc.id, doc.data(), 'technique')).join('');
-          bindInvButtons('technique');
-        });
+  // Technique — même source, affichée dans l’écran Technique
+  unsubTechView && unsubTechView();
+  unsubTechView = db.collection('interventions').where('team','==','technique').orderBy('createdAt','desc')
+    .onSnapshot(snap=>{
+      $('techInterventions').innerHTML = snap.empty
+        ? '<span class="muted">Aucune</span>'
+        : snap.docs.map(d=>renderInterCard(d.data(), d.id)).join('');
+      bindInterButtons();
+    });
 
-      // Inventaire Ménage
-      unsubIM && unsubIM();
-      unsubIM = db.collection('inventaires').doc('menage').collection('items').orderBy('name')
-        .onSnapshot(snap=>{
-          $('im_list').innerHTML = snap.empty? '<span class="muted">Aucun objet</span>' :
-            snap.docs.map(doc=>renderInvItem(doc.id, doc.data(), 'menage')).join('');
-          bindInvButtons('menage');
-        });
+  // Inventaire Technique
+  unsubIT && unsubIT();
+  unsubIT = db.collection('inventaires').doc('technique').collection('items').orderBy('name')
+    .onSnapshot(snap=>{
+      $('it_list').innerHTML = snap.empty
+        ? '<span class="muted">Aucun objet</span>'
+        : snap.docs.map(doc=>renderInvItem(doc.id, doc.data(), 'technique')).join('');
+      bindInvButtons('technique');
+    });
 
-      // Admin — utilisateurs
-      unsubUsers && unsubUsers();
-      unsubUsers = db.collection('users').orderBy('displayName')
-        .onSnapshot(snap=>{
-          const q = ($('userSearch').value||'').toLowerCase();
-          const rows = [];
-          snap.forEach(doc=>{
-            const u=doc.data();
-            if(q && !(u.displayName||'').toLowerCase().includes(q) && !(u.email||'').toLowerCase().includes(q)) return;
-            rows.push(u);
-          });
-          renderUserList(rows);
-        });
-    }
+  // Inventaire Ménage
+  unsubIM && unsubIM();
+  unsubIM = db.collection('inventaires').doc('menage').collection('items').orderBy('name')
+    .onSnapshot(snap=>{
+      $('im_list').innerHTML = snap.empty
+        ? '<span class="muted">Aucun objet</span>'
+        : snap.docs.map(doc=>renderInvItem(doc.id, doc.data(), 'menage')).join('');
+      bindInvButtons('menage');
+    });
+
+  // Admin — utilisateurs
+  unsubUsers && unsubUsers();
+  unsubUsers = db.collection('users').orderBy('displayName')
+    .onSnapshot(snap=>{
+      const q = ($('userSearch').value||'').toLowerCase();
+      const rows = [];
+      snap.forEach(doc=>{
+        const u = doc.data();
+        if(q && !(u.displayName||'').toLowerCase().includes(q) && !(u.email||'').toLowerCase().includes(q)) return;
+        rows.push(u);
+      });
+      renderUserList(rows);
+    });
+}
+
 
     // 7) CRÉER INTERVENTION
     $('btnCreateInter').onclick = async ()=>{
@@ -872,4 +890,3 @@ auth.onAuthStateChanged(async (user)=>{
   </script>
 </body>
 </html>
-
