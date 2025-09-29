@@ -254,26 +254,27 @@
     const db = getFirestore(appFb);
 
     // UI helpers
-    const $ = (sel) => document.querySelector(sel);
-    const $$ = (sel) => Array.from(document.querySelectorAll(sel));
-    const show = el => el.classList.remove('hide');
-    const hide = el => el.classList.add('hide');
+// UI helpers
+const $ = (sel) => document.querySelector(sel);
+const $$ = (sel) => Array.from(document.querySelectorAll(sel));
+const showEl = (el) => el.classList.remove('hide');
+const hideEl = (el) => el.classList.add('hide');
 
-    // Reveal on view
-    const io = new IntersectionObserver((entries)=>{
-      entries.forEach(e=>{ if(e.isIntersecting) e.target.classList.add('in'); });
-    }, { threshold: 0.1 });
-    const revealify = (el)=>{ el.classList.add('reveal'); io.observe(el); };
+// Reveal on view
+const io = new IntersectionObserver((entries)=>{
+  entries.forEach(e=>{ if(e.isIntersecting) e.target.classList.add('in'); });
+}, { threshold: 0.1 });
+const revealify = (el)=>{ el.classList.add('reveal'); io.observe(el); };
 
-    // Theme handling
-    const setTheme = (name)=>{
-      document.documentElement.dataset.theme = name==='ocean' ? 'ocean' : name==='sable' ? 'sable' : 'sky';
-      localStorage.setItem('lp_theme', document.documentElement.dataset.theme);
-    };
-    setTheme(localStorage.getItem('lp_theme')||'sky');
-    document.addEventListener('click', (e)=>{
-      const b = e.target.closest('.theme-dot'); if(!b) return; setTheme(b.dataset.theme);
-    });
+// Theme handling
+const setTheme = (name)=>{
+  document.documentElement.dataset.theme = name==='ocean' ? 'ocean' : name==='sable' ? 'sable' : 'sky';
+  localStorage.setItem('lp_theme', document.documentElement.dataset.theme);
+};
+setTheme(localStorage.getItem('lp_theme')||'sky');
+document.addEventListener('click', (e)=>{
+  const b = e.target.closest('.theme-dot'); if(!b) return; setTheme(b.dataset.theme);
+});
     const show = el => el.classList.remove('hide');
     const hide = el => el.classList.add('hide');
 
