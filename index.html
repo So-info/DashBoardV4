@@ -8,7 +8,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
- <style>
+<style>
+  /* ===== Design tokens ===== */
   :root{
     --bg:#f6f9ff; --surface:#ffffff; --line:#e7eff7;
     --text:#0f172a; --muted:#637189;
@@ -18,17 +19,22 @@
     --shadow: 0 8px 28px rgba(2,6,23,.06);
     --shadow-lg: 0 14px 40px rgba(2,6,23,.10);
   }
+
+  /* ===== Base ===== */
   *{box-sizing:border-box}
   html,body{height:100%}
   body{
-    margin:0; font-family:Inter,system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif; color:var(--text);
+    margin:0; font-family:Inter,system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+    color:var(--text);
     background:radial-gradient(120% 120% at 0% 0%, #eef7ff 0%, #f7fbff 45%, #ffffff 100%);
+    -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
   }
   .container{max-width:820px;margin:0 auto;padding:clamp(12px,2.5vw,24px)}
 
-  /* Header / app shell */
+  /* ===== Header / app shell ===== */
   header{
-    position:sticky; top:0; z-index:30; background:#ffffffcc; backdrop-filter:blur(10px);
+    position:sticky; top:0; z-index:30; background:#ffffffcc;
+    -webkit-backdrop-filter:blur(10px); backdrop-filter:blur(10px);
     border-bottom:1px solid var(--line); box-shadow:var(--shadow);
   }
   .nav{display:flex;align-items:center;gap:10px;padding:10px 0}
@@ -50,13 +56,14 @@
   }
   .back.show{display:inline-flex}
 
-  /* Buttons */
+  /* ===== Buttons ===== */
   .btn{
     display:inline-flex;align-items:center;justify-content:center;gap:8px;
     padding:12px 14px;border-radius:16px;border:1px solid var(--line);
     background:linear-gradient(180deg,#ffffff,#f8fbff);
     color:var(--text); text-decoration:none; font-weight:800;
     box-shadow:var(--shadow); transition:transform .08s ease, box-shadow .2s ease, filter .15s ease;
+    -webkit-tap-highlight-color:transparent; user-select:none;
   }
   .btn:hover{transform:translateY(-1px); box-shadow:var(--shadow-lg)}
   .btn:active{transform:translateY(0)}
@@ -67,8 +74,11 @@
   .btn.primary:hover{filter:brightness(1.03); box-shadow:0 14px 36px rgba(56,189,248,.45)}
   .btn.small{padding:8px 10px;border-radius:12px;font-size:.92rem}
   .btn.icon{width:40px;height:40px;padding:0;border-radius:12px}
+  .btn.ghost{
+    background:transparent; border-color:var(--line); color:var(--text);
+  }
 
-  /* Cards */
+  /* ===== Cards ===== */
   .grid{display:grid;gap:12px}
   .grid.cards{grid-template-columns:1fr}
   @media(min-width:640px){.grid.cards{grid-template-columns:repeat(2,1fr)}}
@@ -81,7 +91,7 @@
   .muted{color:var(--muted)}
   .subpill{display:inline-flex;align-items:center;gap:8px;padding:6px 10px;background:#eef7ff;border:1px solid #d7ebfb;border-radius:999px;color:#075985;font-weight:700}
 
-  /* Form fields */
+  /* ===== Forms ===== */
   input, select, textarea{
     width:100%; padding:12px; border-radius:14px; background:#fff; border:1px solid #dfe8f3; color:var(--text);
     outline:none; transition:border-color .2s ease, box-shadow .2s ease, background .2s ease;
@@ -92,7 +102,7 @@
   .row{display:flex;gap:10px}
   .row > *{flex:1}
 
-  /* Segmented toggles (Oui/Non) */
+  /* Segmented (Oui/Non) */
   .segmented{display:flex;gap:6px;padding:4px;background:#f1f7ff;border:1px solid var(--line);border-radius:12px}
   .segmented input{display:none}
   .segmented label{
@@ -115,101 +125,79 @@
   .danger{color:#b91c1c}
   .divider{height:1px;background:linear-gradient(90deg,transparent,#e9f1fa,transparent);margin:10px 0}
 
-  /* Screen transitions */
+  /* ===== Screens / transitions ===== */
   section[id^="screen-"]{display:none;transform:translateY(8px);opacity:0;transition:transform .25s ease, opacity .25s ease}
   section[id^="screen-"].active{display:block;transform:translateY(0);opacity:1}
 
-  /* Bottom tabbar */
+  /* ===== Bottom tabbar ===== */
   .tabbar{
-    position:fixed;left:0;right:0;bottom:0;z-index:40;background:#ffffffcc; backdrop-filter:blur(12px);
+    position:fixed;left:0;right:0;bottom:0;z-index:40;background:#ffffffcc;
+    -webkit-backdrop-filter:blur(12px); backdrop-filter:blur(12px);
     border-top:1px solid var(--line); box-shadow:0 -6px 20px rgba(2,6,23,.06);
   }
   .tabs{max-width:820px;margin:0 auto;padding:10px;display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
   .tab{display:flex;flex-direction:column;align-items:center;gap:6px;padding:10px;border-radius:14px;border:1px solid transparent;text-align:center;font-size:.78rem;color:#0b2440}
   .tab.active{border-color:#bfe7fb;background:linear-gradient(180deg,#eef9ff,#e6f6ff)}
+
   .hidden{display:none !important}
   .ring{box-shadow:0 0 0 4px var(--ring)}
 
-   /* ====== LOGIN — Hero + Glass card ====== */
-/* === LOGIN plein écran (header masqué sur login) === */
-.login-hero{position:relative; min-height:100vh; display:grid; place-items:center; padding:clamp(16px,4vw,32px)}
-.login-hero .bg{position:absolute; inset:0; overflow:hidden; pointer-events:none;
-  background:radial-gradient(120% 120% at 0% 0%, #eef7ff 0%, #f7fbff 45%, #ffffff 100%);}
-.login-hero .blob{position:absolute; width:480px; height:480px; border-radius:999px; filter:blur(34px); opacity:.55; animation:float 14s ease-in-out infinite}
-.login-hero .b1{left:-120px; top:-80px; background:radial-gradient(closest-side,#bfe9ff,#7dd3fc,#38bdf8)}
-.login-hero .b2{right:-140px; bottom:-140px; background:radial-gradient(closest-side,#e0f2fe,#bae6fd,#7dd3fc)}
-.login-hero .b3{left:38%; top:58%; width:360px; height:360px; background:radial-gradient(closest-side,#dbeafe,#bfdbfe,#93c5fd); animation-duration:18s}
-@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+  /* ===== LOGIN ===== */
+  .login-hero{
+    position:relative; min-height:100vh; display:grid; place-items:center; padding:clamp(16px,4vw,32px)
+  }
+  .login-hero .bg{
+    position:absolute; inset:0; overflow:hidden; pointer-events:none; z-index:0;
+    background:radial-gradient(120% 120% at 0% 0%, #eef7ff 0%, #f7fbff 45%, #ffffff 100%);
+  }
+  .login-hero .blob{position:absolute; width:480px; height:480px; border-radius:999px; filter:blur(34px); opacity:.55; animation:float 14s ease-in-out infinite}
+  .login-hero .b1{left:-120px; top:-80px; background:radial-gradient(closest-side,#bfe9ff,#7dd3fc,#38bdf8)}
+  .login-hero .b2{right:-140px; bottom:-140px; background:radial-gradient(closest-side,#e0f2fe,#bae6fd,#7dd3fc)}
+  .login-hero .b3{left:38%; top:58%; width:360px; height:360px; background:radial-gradient(closest-side,#dbeafe,#bfdbfe,#93c5fd); animation-duration:18s}
+  @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
 
-/* Carte “verre” avec bordure dégradée premium */
-.login-card{position:relative; width:min(620px,94vw); padding:26px 22px; border-radius:28px;
-  background:linear-gradient(180deg,rgba(255,255,255,.75),rgba(255,255,255,.55));
-  border:1px solid rgba(56,189,248,.25); backdrop-filter:blur(10px); box-shadow:0 20px 60px rgba(2,6,23,.12)}
-.login-card.fancy::before{content:\"\"; position:absolute; inset:-1px; border-radius:inherit; padding:1px;
-  background:linear-gradient(135deg,#bfe9ff,#7dd3fc 30%,#38bdf8 60%,#0ea5e9 100%);
-  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0); -webkit-mask-composite:xor; mask-composite:exclude}
-.login-top{display:flex; gap:14px; align-items:center}
-.login-titles h1{margin:2px 0 4px 0; font-size:1.6rem; letter-spacing:.2px}
-.login-titles .accent{color:#0ea5e9}
-.login-titles .mini{font-weight:800; letter-spacing:.18px}
+  /* Carte “verre” + bordure dégradée — FIX clic */
+  .login-card{
+    position:relative; z-index:2; isolation:isolate;            /* crée un contexte de pile */
+    width:min(620px,94vw); padding:26px 22px; border-radius:28px;
+    background:linear-gradient(180deg,rgba(255,255,255,.75),rgba(255,255,255,.55));
+    border:1px solid rgba(56,189,248,.25);
+    -webkit-backdrop-filter:blur(10px); backdrop-filter:blur(10px);
+    box-shadow:0 20px 60px rgba(2,6,23,.12);
+  }
+  .login-card.fancy::before{
+    content:""; position:absolute; inset:-1px; border-radius:inherit; padding:1px;
+    background:linear-gradient(135deg,#bfe9ff,#7dd3fc 30%,#38bdf8 60%,#0ea5e9 100%);
+    -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite:xor; mask-composite:exclude;
+    pointer-events:none;                                           /* ne bloque pas le clic */
+  }
 
-/* Big Google button */
-.gbtn{display:flex; align-items:center; justify-content:center; gap:10px; width:100%; height:56px; border-radius:16px; cursor:pointer;
-  font-weight:800; font-size:1rem; letter-spacing:.2px; background:linear-gradient(180deg,#ffffff,#f5faff);
-  border:1px solid #dbe9f6; color:#0b2440; box-shadow:0 12px 30px rgba(2,6,23,.12); transition:transform .08s ease, box-shadow .2s ease, filter .15s ease}
-.gbtn:hover{transform:translateY(-1px); box-shadow:0 16px 40px rgba(2,6,23,.16)}
-.gbtn:active{transform:translateY(0)}
-.g-icon{width:22px;height:22px}
-.g-arrow{margin-left:2px; transition:transform .15s ease}
-.gbtn:hover .g-arrow{transform:translateX(3px)}
-.login-meta{color:#637189; font-size:.9rem; text-align:center; margin-top:10px}
+  .login-top{display:flex; gap:14px; align-items:center}
+  .logo-img{height:64px; width:auto; object-fit:contain; filter:drop-shadow(0 8px 18px rgba(2,6,23,.12))}
+  @media (min-width:768px){ .logo-img{height:72px} }
+  .login-titles h1{margin:2px 0 4px 0; font-size:1.6rem; letter-spacing:.2px}
+  .login-titles .accent{color:#0ea5e9}
+  .login-titles .mini{font-weight:800; letter-spacing:.18px}
 
-
-/* Big Google button */
-.gbtn{
-  display:flex; align-items:center; justify-content:center; gap:10px;
-  width:100%; height:56px; border-radius:16px; cursor:pointer;
-  font-weight:800; font-size:1rem; letter-spacing:.2px;
-  background:linear-gradient(180deg,#ffffff,#f5faff);
-  border:1px solid #dbe9f6; color:#0b2440; box-shadow:0 10px 26px rgba(2,6,23,.10);
-  transition:transform .08s ease, box-shadow .2s ease, filter .15s ease;
-}
-.gbtn:hover{transform:translateY(-1px); box-shadow:0 14px 38px rgba(2,6,23,.16)}
-.gbtn:active{transform:translateY(0)}
-.g-icon{width:22px;height:22px; display:inline-block}
-.g-arrow{margin-left:2px; transition:transform .15s ease}
-.gbtn:hover .g-arrow{transform:translateX(3px)}
-.login-meta{color:#637189; font-size:.9rem; text-align:center; margin-top:10px}
-
-@media (min-width:768px){
-  .login-card{padding:34px 28px}
-}
-/* --- LOGIN: logo image au lieu du carré dégradé --- */
-.login-top{display:flex; gap:14px; align-items:center}
-.logo-img{
-  height:64px; width:auto; object-fit:contain;
-  filter: drop-shadow(0 8px 18px rgba(2,6,23,.12));
-}
-@media (min-width:768px){ .logo-img{height:72px} }
-
-.login-titles h1{margin:2px 0 4px 0; font-size:1.6rem; letter-spacing:.2px}
-.login-titles .accent{color:#0ea5e9} /* bleu ciel */
-.login-titles .mini{font-weight:800; letter-spacing:.18px}
-
-/* Carte “verre” avec bordure dégradée (garde si tu l’as déjà) */
-.login-card{position:relative; width:min(620px,94vw); padding:26px 22px; border-radius:28px;
-  background:linear-gradient(180deg,rgba(255,255,255,.75),rgba(255,255,255,.55));
-  border:1px solid rgba(56,189,248,.25); backdrop-filter:blur(10px); box-shadow:0 20px 60px rgba(2,6,23,.12)}
-.login-card.fancy::before{content:""; position:absolute; inset:-1px; border-radius:inherit; padding:1px;
-  background:linear-gradient(135deg,#bfe9ff,#7dd3fc 30%,#38bdf8 60%,#0ea5e9 100%);
-  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
-  -webkit-mask-composite:xor; mask-composite:exclude}
-/* Assure que la carte est au-dessus du décor et capte les clics */
-.login-hero { position: relative; }
-.login-hero .bg { position:absolute; inset:0; z-index:0; pointer-events:none; }
-.login-card { position:relative; z-index:2; }     /* <- clé */
-
+  /* Gros bouton Google */
+  .gbtn{
+    display:flex; align-items:center; justify-content:center; gap:10px;
+    width:100%; height:56px; border-radius:16px; cursor:pointer;
+    font-weight:800; font-size:1rem; letter-spacing:.2px;
+    background:linear-gradient(180deg,#ffffff,#f5faff);
+    border:1px solid #dbe9f6; color:#0b2440; box-shadow:0 10px 26px rgba(2,6,23,.10);
+    transition:transform .08s ease, box-shadow .2s ease, filter .15s ease;
+    position:relative; z-index:3; user-select:none; -webkit-tap-highlight-color:transparent;
+  }
+  .gbtn:hover{transform:translateY(-1px); box-shadow:0 14px 38px rgba(2,6,23,.16)}
+  .gbtn:active{transform:translateY(0)}
+  .g-icon{width:22px;height:22px; display:inline-block}
+  .g-arrow{margin-left:2px; transition:transform .15s ease}
+  .gbtn:hover .g-arrow{transform:translateX(3px)}
+  .login-meta{color:#637189; font-size:.9rem; text-align:center; margin-top:10px}
 </style>
+
 </head>
 <body>
 <header id="appHeader">
@@ -265,7 +253,7 @@
 
   <main class="container">
     <!-- DASHBOARD -->
-    <section id="screen-dashboard" class="grid cards active">
+    <section id="screen-dashboard" class="grid cards">
       <div class="card">
         <h3>Bienvenue 👋</h3>
         <p class="muted">Sélectionnez une section ci-dessous. Votre rôle : <span id="roleLabel">—</span></p>
@@ -897,6 +885,7 @@ function wireRealtime(){
         }
       })
     }
+
     // Footer
     $('year').textContent = new Date().getFullYear();
 
