@@ -379,49 +379,54 @@ document.addEventListener('click', (e)=>{
       switchTab(last);
 
       // Live dashboard (tech in-progress)
-      if(unsubDashTech) unsubDashTech();
-      unsubDashTech = onSnapshot(query(collection(db,'interventions'), where('type','==','tech')), (qs)=>{
-        // KPIs
-        const arr = [];
-        qs.forEach(d=>{ const it = {id:d.id, ...d.data()}; arr.push(it); });
-        const total = arr.length;
-        const doing = arr.filter(x=>x.status==='doing').length;
-        const done  = arr.filter(x=>x.status==='done' || x.locked===true).length;
-        // average duration (createdAt -> validatedAt) for locked
-        const durations = arr
-          .filter(x=>x.locked && x.createdAt && x.validatedAt)
-          .map(x=> (x.validatedAt.toDate?.()||new Date(x.validatedAt)).getTime() - (x.createdAt.toDate?.()||new Date(x.createdAt)).getTime());
-        const avgMs = durations.length ? Math.round(durations.reduce((a,b)=>a+b,0)/durations.length) : 0;
-        const fmt = (ms)=>{ if(!ms) return '—'; const m=Math.floor(ms/60000), h=Math.floor(m/60); const mm=(m%60).toString().padStart(2,'0'); return h?`${h}h${mm}`:`${m} min`; };
-        $('#kpiTotal').textContent = total;
-        $('#kpiDoing').textContent = doing;
-        $('#kpiDone').textContent  = done;
-        $('#kpiAvg').textContent   = fmt(avgMs);
+// Live dashboard (tech in-progress)
+if (unsubDashTech) unsubDashTech();
+unsubDashTech = onSnapshot(
+  query(collection(db,'interventions'), where('type','==','tech')),
+  (qs)=>{
+    // KPIs
+    const arr = [];
+    qs.forEach(d=>{ const it = {id:d.id, ...d.data()}; arr.push(it); });
+    const total = arr.length;
+    const doing = arr.filter(x=>x.status==='doing').length;
+    const done  = arr.filter(x=>x.status==='done' || x.locked===true).length;
+    // average duration (createdAt -> validatedAt) for locked
+    const durations = arr
+      .filter(x=>x.locked && x.createdAt && x.validatedAt)
+      .map(x=> (x.validatedAt.toDate?.()||new Date(x.validatedAt)).getTime() - (x.createdAt.toDate?.()||new Date(x.createdAt)).getTime());
+    const avgMs = durations.length ? Math.round(durations.reduce((a,b)=>a+b,0)/durations.length) : 0;
+    const fmt = (ms)=>{ if(!ms) return '—'; const m=Math.floor(ms/60000), h=Math.floor(m/60); const mm=(m%60).toString().padStart(2,'0'); return h?`${h}h${mm}`:`${m} min`; };
+    $('#kpiTotal').textContent = total;
+    $('#kpiDoing').textContent = doing;
+    $('#kpiDone').textContent  = done;
+    $('#kpiAvg').textContent   = fmt(avgMs);
 
-        // Dashboard list (only not locked shown)
-        const ul = $('#dashTechList'); ul.innerHTML='';
-        arr.filter(x=>!x.locked).forEach(it=>{
-          const li = document.createElement('li');
-          li.className = 'flex items-center justify-between gap-2 rounded-xl border p-3 bg-white reveal';
-          li.innerHTML = `
-            <div>
-              <div class="font-semibold">MH ${it.mh} – ${it.detail || ''}</div>
-              <div class="text-xs opacity-80">Présents: ${it.present? 'oui':'non'} · Entrée: ${it.authorized? 'oui':'non'}</div>
-            </div>
-            <span class="chip ${it.status==='todo'?'todo':it.status==='doing'?'doing':'done'}">
-              ${it.status==='todo'?'À faire':it.status==='doing'?'En cours':'Terminée'}
-            </span>`;
-          ul.appendChild(li); revealify(li);
-          revealify(li);
-        });
-      });
-      });
+    // Dashboard list (only not locked shown)
+    const ul = $('#dashTechList'); ul.innerHTML='';
+    arr.filter(x=>!x.locked).forEach(it=>{
+      const li = document.createElement('li');
+      li.className = 'flex items-center justify-between gap-2 rounded-xl border p-3 bg-white reveal';
+      li.innerHTML = `
+        <div>
+          <div class="font-semibold">MH ${it.mh} – ${it.detail || ''}</div>
+          <div class="text-xs opacity-80">Présents: ${it.present? 'oui':'non'} · Entrée: ${it.authorized? 'oui':'non'}</div>
+        </div>
+        <span class="chip ${it.status==='todo'?'todo':it.status==='doing'?'doing':'done'}">
+          ${it.status==='todo'?'À faire':it.status==='doing'?'En cours':'Terminée'}
+        </span>`;
+      ul.appendChild(li);
+      revealify(li);
+    });
+  }
+);
 
-      // Wire pages depending on role
-      wireReception(role);
-      wireTech(role, user);
-      wireAdmin(role, user);
-      wireInventories(role);
+// Wire pages depending on role  👉 (reste DANS onAuthStateChanged)
+wireReception(role);
+wireTech(role, user);
+wireAdmin(role, user);
+wireInventories(role);
+
+}); // <-- ceci ferme onAuthStateChanged, une seule fois, ici.
 
     // ===== Reception logic =====
     function wireReception(role){
