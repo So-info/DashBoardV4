@@ -24,39 +24,75 @@
     }
   </script>
   <style>
+    :root {
+      --radius: 18px;
+      /* Theme: sky (default) */
+      --brand-50:#eef7ff; --brand-100:#d9efff; --brand-200:#b3e0ff; --brand-300:#84ccff; --brand-400:#49b7ff;
+      --brand-500:#1a9cf7; --brand-600:#0d7ed1; --brand-700:#0b67ab; --brand-800:#0a5388; --brand-900:#0a446f;
+      --bg-grad-1:#d9efff; --bg-grad-2:#b3e0ff;
+    }
+    /* Theme: ocean */
+    :root[data-theme="ocean"]{
+      --brand-50:#e8fbff; --brand-100:#d1f6ff; --brand-200:#a4ecff; --brand-300:#6fe1ff; --brand-400:#33d1ff;
+      --brand-500:#08b6ea; --brand-600:#0796c1; --brand-700:#07799b; --brand-800:#065f7a; --brand-900:#054c62;
+      --bg-grad-1:#d1f6ff; --bg-grad-2:#a4ecff;
+    }
+    /* Theme: sand */
+    :root[data-theme="sable"]{
+      --brand-50:#fff8ec; --brand-100:#fff0d6; --brand-200:#ffe1ad; --brand-300:#ffd07e; --brand-400:#ffc057;
+      --brand-500:#f2a73a; --brand-600:#d1842b; --brand-700:#a76321; --brand-800:#874f1a; --brand-900:#6d4015;
+      --bg-grad-1:#fff0d6; --bg-grad-2:#ffe1ad;
+    }
+
+    body { font-feature-settings: 'cv02','cv03','cv04','cv11'; }
     /* Mobile-first helpers */
-    .card { @apply bg-white rounded-2xl shadow-soft p-4; }
-    .btn  { @apply rounded-xl px-4 py-3 font-semibold active:scale-95 transition; }
-    .btn-primary { @apply bg-skybrand-500 text-white; }
-    .btn-outline { @apply border border-skybrand-500 text-skybrand-700; }
-    .chip { @apply inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-medium; }
-    .chip.todo { @apply bg-skybrand-100 text-skybrand-800; }
-    .chip.doing { @apply bg-yellow-100 text-yellow-800; }
-    .chip.done { @apply bg-emerald-100 text-emerald-800; }
-    .chip.lock { @apply bg-gray-100 text-gray-700; }
+    .card { border-radius: var(--radius); background: rgba(255,255,255,0.9); box-shadow: var(--tw-shadow), var(--tw-ring-shadow, 0 0 #0000); }
+    .btn  { border-radius: 14px; padding: 0.75rem 1rem; font-weight: 700; transition: transform .05s ease, box-shadow .2s ease; }
+    .btn:active { transform: scale(.98); }
+    .btn-primary { background: linear-gradient(180deg, var(--brand-400), var(--brand-500)); color:#fff; box-shadow: 0 6px 18px -8px rgba(10,83,136,.6); }
+    .btn-outline { border: 1px solid var(--brand-400); color:var(--brand-700); background: #fff; }
+    .chip { display:inline-flex; align-items:center; gap:.5rem; border-radius:9999px; padding:.25rem .6rem; font-size:.7rem; font-weight:600; }
+    .chip.todo { background:color-mix(in oklab, var(--brand-100) 70%, white); color:var(--brand-900); }
+    .chip.doing { background:#fff7e6; color:#8a5a00; }
+    .chip.done { background:#e9fbf1; color:#046d3a; }
+    .chip.lock { background:#eaeaea; color:#494949; }
     .hide { display:none; }
+
+    /* --- Reveal animations --- */
+    .reveal { opacity: 0; transform: translateY(10px); transition: opacity .4s ease, transform .4s ease; }
+    .reveal.in { opacity: 1; transform: translateY(0); }
   </style>
 </head>
-<body class="min-h-screen bg-skybrand-50 text-skybrand-900">
+<body class="min-h-screen bg-[radial-gradient(60rem_60rem_at_20%_-10%,var(--bg-grad-1)_20%,transparent_60%),radial-gradient(40rem_40rem_at_120%_20%,var(--bg-grad-2)_10%,transparent_50%)] text-brand-900">
   <!-- Top bar -->
   <header class="sticky top-0 z-40 bg-skybrand-50/80 backdrop-blur border-b border-skybrand-100">
     <div class="max-w-xl mx-auto flex items-center justify-between p-3">
+      
       <div class="flex items-center gap-3">
         <img src="logo-camping-la-plage.png" alt="La Plage" class="h-8 w-8 rounded-full"/>
         <h1 class="text-lg font-extrabold tracking-tight">La Plage – Dashboard</h1>
       </div>
-      <div id="userBadge" class="flex items-center gap-2 text-sm"></div>
+      <div class="flex items-center gap-2">
+          <div class="hidden sm:flex items-center gap-1 bg-white/60 px-2 py-1 rounded-full shadow-soft text-xs">
+            <button class="theme-dot" data-theme="sky" title="Bleu ciel">🔵</button>
+            <button class="theme-dot" data-theme="ocean" title="Océan">🟦</button>
+            <button class="theme-dot" data-theme="sable" title="Sable">🟨</button>
+          </div>
+          <div id="userBadge" class="flex items-center gap-2 text-sm bg-white/60 px-2 py-1 rounded-full shadow-soft"></div>
+        </div>
     </div>
   </header>
 
   <!-- LOGIN PAGE (only Google button + logo + welcome message) -->
-  <main id="page-login" class="max-w-xl mx-auto p-6 flex flex-col gap-6">
-    <div class="card text-center">
-      <img src="logo-la-plage.png" alt="La Plage" class="mx-auto h-20 w-20 mb-3"/>
-      <h2 class="text-2xl font-bold">Bienvenue sur le dashboard du camping La Plage</h2>
-      <p class="mt-2 text-skybrand-700">Accédez avec votre compte Google pour continuer.</p>
+  <main id="page-login" class="max-w-xl mx-auto px-4 py-10 grid gap-6">
+    <div class="card p-6 shadow-ring">
+      <div class="text-center">
+        <img src="logo-camping-la-plage.png" alt="La Plage" class="mx-auto h-16 w-16 rounded-full ring-2 ring-brand-200 mb-4"/>
+        <h2 class="text-3xl font-extrabold leading-tight">Bienvenue sur le dashboard du camping La Plage</h2>
+        <p class="mt-2 text-brand-700">Accédez avec votre compte Google pour continuer.</p>
+      </div>
       <button id="btnGoogle" class="btn btn-primary mt-6 w-full flex items-center justify-center gap-3">
-        <svg aria-hidden="true" viewBox="0 0 512 512" class="h-5 w-5"><path fill="currentColor" d="M272 208v96h133c-6 35-40 104-133 104-80 0-145-66-145-146s65-146 145-146c45 0 75 19 92 35l63-61C377 62 327 40 272 40 141 40 36 145 36 276s105 236 236 236c136 0 226-96 226-232 0-16-2-27-4-40H272z"/></svg>
+        <svg aria-hidden="true" viewBox="0 0 24 24" class="h-5 w-5"><path fill="currentColor" d="M21.35 11.1h-9.18v2.91h5.27c-.23 1.49-1.58 4.37-5.27 4.37-3.18 0-5.77-2.63-5.77-5.86S9 6.66 12.17 6.66c1.81 0 3.03.77 3.73 1.43l2.55-2.47C16.98 4.34 14.86 3.5 12.17 3.5 6.95 3.5 2.7 7.79 2.7 13s4.25 9.5 9.47 9.5c5.46 0 9.07-3.84 9.07-9.26 0-.62-.06-1.08-.14-1.64Z"/></svg>
         Continuer avec Google
       </button>
     </div>
@@ -66,29 +102,45 @@
   <section id="app" class="hide max-w-xl mx-auto p-4 pb-24">
 
     <!-- Role-aware tabs (only relevant tabs appear) -->
-    <nav id="tabbar" class="fixed bottom-0 left-0 right-0 bg-white border-t border-skybrand-100">
+    <nav id="tabbar" class="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur border-t border-brand-100">
       <div class="max-w-xl mx-auto grid grid-cols-4 gap-1 p-2 text-xs">
-        <button data-tab="home" class="btn btn-outline">Accueil</button>
-        <button data-tab="reception" class="btn btn-outline hide">Réception</button>
-        <button data-tab="tech" class="btn btn-outline hide">Technique</button>
-        <button data-tab="clean" class="btn btn-outline hide">Ménage</button>
-        <button data-tab="inventory-tech" class="btn btn-outline hide">Invent. Tech</button>
-        <button data-tab="inventory-clean" class="btn btn-outline hide">Invent. Ménage</button>
-        <button data-tab="admin" class="btn btn-outline hide">Admin</button>
-        <button id="btnSignOut" class="btn btn-primary">Quitter</button>
+        <button data-tab="home" class="btn btn-outline flex items-center justify-center gap-2"><svg viewBox="0 0 24 24" class="w-4 h-4"><path fill="currentColor" d="M12 3l9 8h-3v9H6v-9H3z"/></svg>Accueil</button>
+        <button data-tab="reception" class="btn btn-outline hide flex items-center justify-center gap-2"><svg viewBox="0 0 24 24" class="w-4 h-4"><path fill="currentColor" d="M3 6h18v2H3zm0 5h18v2H3zm0 5h12v2H3z"/></svg>Réception</button>
+        <button data-tab="tech" class="btn btn-outline hide flex items-center justify-center gap-2"><svg viewBox="0 0 24 24" class="w-4 h-4"><path fill="currentColor" d="M22 13v-2h-2.07a7.95 7.95 0 00-1.07-2.57l1.46-1.46-1.41-1.41-1.46 1.46A7.95 7.95 0 0013 4.07V2h-2v2.07a7.95 7.95 0 00-2.57 1.07L6.97 3.68 5.56 5.1l1.46 1.46A7.95 7.95 0 006 9.93H4v2h2.07c.2.92.55 1.78 1.07 2.57L5.68 16.6l1.41 1.41 1.46-1.46c.79.52 1.65.87 2.57 1.07V20h2v-2.07c.92-.2 1.78-.55 2.57-1.07l1.46 1.46 1.41-1.41-1.46-1.46c.52-.79.87-1.65 1.07-2.57H22zM12 15a3 3 0 110-6 3 3 0 010 6z"/></svg>Technique</button>
+        <button data-tab="clean" class="btn btn-outline hide flex items-center justify-center gap-2"><svg viewBox="0 0 24 24" class="w-4 h-4"><path fill="currentColor" d="M5 21h14v-2H5v2zm7-18C8.69 3 6 5.69 6 9c0 3.87 4 9 6 12 2-3 6-8.13 6-12 0-3.31-2.69-6-6-6zm0 8.5c-1.38 0-2.5-1.12-2.5-2.5S10.62 6.5 12 6.5s2.5 1.12 2.5 2.5S13.38 11.5 12 11.5z"/></svg>Ménage</button>
+        <button data-tab="inventory-tech" class="btn btn-outline hide flex items-center justify-center gap-2"><svg viewBox="0 0 24 24" class="w-4 h-4"><path fill="currentColor" d="M20 6H4V4h16v2zm0 4H4v2h16v-2zm0 6H4v2h16v-2z"/></svg>Invent. Tech</button>
+        <button data-tab="inventory-clean" class="btn btn-outline hide flex items-center justify-center gap-2"><svg viewBox="0 0 24 24" class="w-4 h-4"><path fill="currentColor" d="M4 4h16v2H4zm0 6h16v2H4zm0 6h10v2H4z"/></svg>Invent. Ménage</button>
+        <button data-tab="admin" class="btn btn-outline hide flex items-center justify-center gap-2"><svg viewBox="0 0 24 24" class="w-4 h-4"><path fill="currentColor" d="M12 12a5 5 0 100-10 5 5 0 000 10zm-9 9v-1a7 7 0 0114 0v1H3z"/></svg>Admin</button>
+        <button id="btnSignOut" class="btn btn-primary flex items-center justify-center gap-2"><svg viewBox="0 0 24 24" class="w-4 h-4"><path fill="currentColor" d="M10 17l5-5-5-5v10zm-6 4h8v-2H6V5h6V3H4v18z"/></svg>Quitter</button>
       </div>
     </nav>
 
     <!-- HOME / DASHBOARD -->
     <section id="tab-home" class="tab p-2 mt-2">
-      <div class="card">
+      <div class="card p-4 reveal">
         <h2 class="text-xl font-bold">Tableau de bord</h2>
         <p class="mt-1 text-sm">Vous êtes connecté en tant que <span id="roleLabel" class="font-semibold"></span>.</p>
-        <div class="mt-4 grid gap-3">
-          <div class="card bg-skybrand-50">
-            <h3 class="font-semibold">Interventions en cours (Technique)</h3>
-            <ul id="dashTechList" class="mt-2 text-sm grid gap-2"></ul>
+        <div class="mt-4 grid grid-cols-2 gap-3" id="kpiWrap">
+          <div class="card p-3 text-center">
+            <div class="text-xs opacity-70">Total interventions</div>
+            <div id="kpiTotal" class="text-2xl font-extrabold">—</div>
           </div>
+          <div class="card p-3 text-center">
+            <div class="text-xs opacity-70">En cours</div>
+            <div id="kpiDoing" class="text-2xl font-extrabold">—</div>
+          </div>
+          <div class="card p-3 text-center">
+            <div class="text-xs opacity-70">Terminées</div>
+            <div id="kpiDone" class="text-2xl font-extrabold">—</div>
+          </div>
+          <div class="card p-3 text-center">
+            <div class="text-xs opacity-70">Temps moyen (validées)</div>
+            <div id="kpiAvg" class="text-2xl font-extrabold">—</div>
+          </div>
+        </div>
+        <div class="mt-4 card bg-white/70 p-3">
+          <h3 class="font-semibold">Interventions en cours (Technique)</h3>
+          <ul id="dashTechList" class="mt-2 text-sm grid gap-2"></ul>
         </div>
       </div>
     </section>
@@ -207,6 +259,24 @@
     const show = el => el.classList.remove('hide');
     const hide = el => el.classList.add('hide');
 
+    // Reveal on view
+    const io = new IntersectionObserver((entries)=>{
+      entries.forEach(e=>{ if(e.isIntersecting) e.target.classList.add('in'); });
+    }, { threshold: 0.1 });
+    const revealify = (el)=>{ el.classList.add('reveal'); io.observe(el); };
+
+    // Theme handling
+    const setTheme = (name)=>{
+      document.documentElement.dataset.theme = name==='ocean' ? 'ocean' : name==='sable' ? 'sable' : 'sky';
+      localStorage.setItem('lp_theme', document.documentElement.dataset.theme);
+    };
+    setTheme(localStorage.getItem('lp_theme')||'sky');
+    document.addEventListener('click', (e)=>{
+      const b = e.target.closest('.theme-dot'); if(!b) return; setTheme(b.dataset.theme);
+    });
+    const show = el => el.classList.remove('hide');
+    const hide = el => el.classList.add('hide');
+
     // Pages / tabs
     const pageLogin = $('#page-login');
     const app = $('#app');
@@ -309,12 +379,29 @@
 
       // Live dashboard (tech in-progress)
       if(unsubDashTech) unsubDashTech();
-      unsubDashTech = onSnapshot(query(collection(db,'interventions'), where('type','==','tech'), where('locked','==', false)), (qs)=>{
+      unsubDashTech = onSnapshot(query(collection(db,'interventions'), where('type','==','tech')), (qs)=>{
+        // KPIs
+        const arr = [];
+        qs.forEach(d=>{ const it = {id:d.id, ...d.data()}; arr.push(it); });
+        const total = arr.length;
+        const doing = arr.filter(x=>x.status==='doing').length;
+        const done  = arr.filter(x=>x.status==='done' || x.locked===true).length;
+        // average duration (createdAt -> validatedAt) for locked
+        const durations = arr
+          .filter(x=>x.locked && x.createdAt && x.validatedAt)
+          .map(x=> (x.validatedAt.toDate?.()||new Date(x.validatedAt)).getTime() - (x.createdAt.toDate?.()||new Date(x.createdAt)).getTime());
+        const avgMs = durations.length ? Math.round(durations.reduce((a,b)=>a+b,0)/durations.length) : 0;
+        const fmt = (ms)=>{ if(!ms) return '—'; const m=Math.floor(ms/60000), h=Math.floor(m/60); const mm=(m%60).toString().padStart(2,'0'); return h?`${h}h${mm}`:`${m} min`; };
+        $('#kpiTotal').textContent = total;
+        $('#kpiDoing').textContent = doing;
+        $('#kpiDone').textContent  = done;
+        $('#kpiAvg').textContent   = fmt(avgMs);
+
+        // Dashboard list (only not locked shown)
         const ul = $('#dashTechList'); ul.innerHTML='';
-        qs.forEach(docu=>{
-          const it = docu.data();
+        arr.filter(x=>!x.locked).forEach(it=>{
           const li = document.createElement('li');
-          li.className = 'flex items-center justify-between gap-2 rounded-xl border p-3 bg-white';
+          li.className = 'flex items-center justify-between gap-2 rounded-xl border p-3 bg-white reveal';
           li.innerHTML = `
             <div>
               <div class="font-semibold">MH ${it.mh} – ${it.detail || ''}</div>
@@ -323,8 +410,10 @@
             <span class="chip ${it.status==='todo'?'todo':it.status==='doing'?'doing':'done'}">
               ${it.status==='todo'?'À faire':it.status==='doing'?'En cours':'Terminée'}
             </span>`;
-          ul.appendChild(li);
+          ul.appendChild(li); revealify(li);
+          revealify(li);
         });
+      });
       });
 
       // Wire pages depending on role
@@ -375,7 +464,7 @@
             <div class="mt-1 text-xs opacity-80">Clients présents: ${it.present? 'oui':'non'} · Autorisation: ${it.authorized? 'oui':'non'}</div>
             ${it.locked && it.validatedByName ? `<div class='mt-1 text-xs'>Validée par <b>${it.validatedByName}</b></div>`:''}
           `;
-          ul.appendChild(li);
+          ul.appendChild(li); revealify(li);
         });
       });
     }
@@ -404,7 +493,7 @@
           .filter(it=> currentFilter==='all' ? true : currentFilter==='done' ? it.status==='done' : currentFilter==='doing' ? it.status==='doing' : it.status==='todo')
           .forEach(it=>{
             const li = document.createElement('li');
-            li.className = 'card';
+            li.className = 'card reveal';
             li.innerHTML = `
               <div class="flex items-center justify-between">
                 <div>
@@ -443,7 +532,7 @@
               }
             });
 
-            ul.appendChild(li);
+            ul.appendChild(li); revealify(li);
           });
       }
     }
@@ -451,12 +540,15 @@
     // ===== Admin logic =====
     function wireAdmin(role, user){
       if(role!=='admin') return;
-      const ul = $('#usersList');
+      const ul = document.querySelector('#usersList');
       if(unsubUsers) unsubUsers();
-      unsubUsers = onSnapshot(query(collection(db,'users'), orderBy('createdAt','desc')), (qs)=>{
+      unsubUsers = onSnapshot(query(collection(db,'users'), orderBy('createdAt','desc')), async (qs)=>{
         ul.innerHTML='';
-        qs.forEach(d=>{
+        for (const d of qs.docs){
           const u = { id: d.id, ...d.data() };
+          const rref = doc(db,'roles', u.id);
+          const rs = await getDoc(rref);
+          const currentRole = rs.exists() ? rs.data().role : 'reception';
           const li = document.createElement('li');
           li.className = 'rounded-xl border p-3 bg-white flex items-center gap-3 justify-between';
           li.innerHTML = `
@@ -469,7 +561,7 @@
             </div>
             <div class="flex items-center gap-2">
               <select class="rounded-xl border p-2" data-uid="${u.id}">
-                ${ROLES.map(r=>`<option value="${r}" ${u.role===r?'selected':''}>${r}</option>`).join('')}
+                ${ROLES.map(r=>`<option value="${r}" ${currentRole===r?'selected':''}>${r}</option>`).join('')}
               </select>
               <button class="btn btn-primary" data-save="${u.id}">Enregistrer</button>
             </div>
@@ -478,10 +570,10 @@
             const s = e.target.closest('button[data-save]'); if(!s) return;
             const uid = s.dataset.save;
             const newRole = li.querySelector('select').value;
-            await updateDoc(doc(db,'users', uid), { role: newRole });
+            await setDoc(doc(db,'roles', uid), { role: newRole, updatedAt: serverTimestamp() }, { merge: true });
           });
-          ul.appendChild(li);
-        });
+          ul.appendChild(li); revealify(li);
+        }
       });
     }
 
@@ -535,46 +627,6 @@
         });
       }
     }
-
-    // ===== Simple client-side guard (visual) for locked interventions =====
-    // Firestore Security Rules (à coller dans la console Firebase > Firestore > Règles)
-    /*
-    rules_version = '2';
-    service cloud.firestore {
-      match /databases/{database}/documents {
-        function isSignedIn() { return request.auth != null; }
-        function isAdmin() { return isSignedIn() && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin'; }
-        function hasRole(r) { return isSignedIn() && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == r; }
-
-        match /users/{uid} {
-          allow read: if isAdmin();
-          allow write: if isAdmin(); // seul l'admin gère les rôles
-          allow create: if isSignedIn();
-          allow get: if isSignedIn() && request.auth.uid == uid || isAdmin();
-        }
-
-        match /interventions/{id} {
-          allow read: if isSignedIn();
-          // Création par réception/admin
-          allow create: if hasRole('reception') || isAdmin();
-          // MAJ par technique tant que non verrouillée
-          allow update: if (
-            (hasRole('tech') && resource.data.type == 'tech' && !resource.data.locked)
-          ) || isAdmin();
-        }
-
-        match /inventory_tech/{id} {
-          allow read: if isSignedIn();
-          allow write: if hasRole('tech') || hasRole('reception') || isAdmin();
-        }
-        match /inventory_clean/{id} {
-          allow read: if isSignedIn();
-          allow write: if hasRole('clean') || hasRole('reception') || isAdmin();
-        }
-      }
-    }
-    */
   </script>
 </body>
 </html>
-
