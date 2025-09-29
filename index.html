@@ -2,856 +2,578 @@
 <html lang="fr">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover" />
-  <title>La Plage — Intranet mobile</title>
-<meta name="theme-color" content="#38bdf8" />
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<style>
-  /* ===== Design tokens ===== */
-  :root{
-    --bg:#f6f9ff; --surface:#ffffff; --line:#e7eff7;
-    --text:#0f172a; --muted:#637189;
-    --brand:#38bdf8; --brand-2:#0ea5e9;
-    --ok:#16a34a; --warn:#f59e0b; --bad:#ef4444;
-    --ring: rgba(56,189,248,.35);
-    --shadow: 0 8px 28px rgba(2,6,23,.06);
-    --shadow-lg: 0 14px 40px rgba(2,6,23,.10);
-  }
-
-  /* ===== Base ===== */
-  *{box-sizing:border-box}
-  html,body{height:100%}
-  body{
-    margin:0; font-family:Inter,system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
-    color:var(--text);
-    background:radial-gradient(120% 120% at 0% 0%, #eef7ff 0%, #f7fbff 45%, #ffffff 100%);
-    -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
-  }
-  .container{max-width:820px;margin:0 auto;padding:clamp(12px,2.5vw,24px)}
-
-  /* ===== Header / app shell ===== */
-  header{
-    position:sticky; top:0; z-index:30; background:#ffffffcc;
-    -webkit-backdrop-filter:blur(10px); backdrop-filter:blur(10px);
-    border-bottom:1px solid var(--line); box-shadow:var(--shadow);
-  }
-  .nav{display:flex;align-items:center;gap:10px;padding:10px 0}
-  .brand{display:flex;align-items:center;gap:10px;font-weight:800;letter-spacing:.2px}
-  .brand .logo{
-    width:36px;height:36px;border-radius:10px;
-    background:radial-gradient(120% 120% at 100% 0, #bfe9ff, #7dd3fc 40%, #38bdf8 60%, #0ea5e9 100%);
-    box-shadow:0 10px 22px rgba(56,189,248,.35);
-  }
-  .spacer{flex:1}
-  .pill{
-    display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border:1px solid var(--line);
-    border-radius:999px;background:#f8fbff;color:#0b2440;font-weight:700;
-  }
-  .back{
-    display:none;align-items:center;gap:8px;padding:10px;border-radius:12px;
-    border:1px solid var(--line); background:linear-gradient(180deg,#ffffff,#f8fbff); font-weight:600;
-    box-shadow:var(--shadow);
-  }
-  .back.show{display:inline-flex}
-
-  /* ===== Buttons ===== */
-  .btn{
-    display:inline-flex;align-items:center;justify-content:center;gap:8px;
-    padding:12px 14px;border-radius:16px;border:1px solid var(--line);
-    background:linear-gradient(180deg,#ffffff,#f8fbff);
-    color:var(--text); text-decoration:none; font-weight:800;
-    box-shadow:var(--shadow); transition:transform .08s ease, box-shadow .2s ease, filter .15s ease;
-    -webkit-tap-highlight-color:transparent; user-select:none;
-  }
-  .btn:hover{transform:translateY(-1px); box-shadow:var(--shadow-lg)}
-  .btn:active{transform:translateY(0)}
-  .btn.primary{
-    background:linear-gradient(180deg, var(--brand), var(--brand-2));
-    color:#063246; border-color:rgba(56,189,248,.5); box-shadow:0 10px 26px rgba(56,189,248,.35);
-  }
-  .btn.primary:hover{filter:brightness(1.03); box-shadow:0 14px 36px rgba(56,189,248,.45)}
-  .btn.small{padding:8px 10px;border-radius:12px;font-size:.92rem}
-  .btn.icon{width:40px;height:40px;padding:0;border-radius:12px}
-  .btn.ghost{
-    background:transparent; border-color:var(--line); color:var(--text);
-  }
-
-  /* ===== Cards ===== */
-  .grid{display:grid;gap:12px}
-  .grid.cards{grid-template-columns:1fr}
-  @media(min-width:640px){.grid.cards{grid-template-columns:repeat(2,1fr)}}
-  .card{
-    background:var(--surface); border:1px solid var(--line); border-radius:22px;
-    padding:16px; box-shadow:var(--shadow); transition:transform .2s ease, box-shadow .2s ease;
-  }
-  .card:hover{transform:translateY(-1px); box-shadow:var(--shadow-lg)}
-  .card h3{margin:4px 0 8px 0;font-size:1.08rem}
-  .muted{color:var(--muted)}
-  .subpill{display:inline-flex;align-items:center;gap:8px;padding:6px 10px;background:#eef7ff;border:1px solid #d7ebfb;border-radius:999px;color:#075985;font-weight:700}
-
-  /* ===== Forms ===== */
-  input, select, textarea{
-    width:100%; padding:12px; border-radius:14px; background:#fff; border:1px solid #dfe8f3; color:var(--text);
-    outline:none; transition:border-color .2s ease, box-shadow .2s ease, background .2s ease;
-  }
-  input:focus, select:focus, textarea:focus{border-color:var(--brand-2); box-shadow:0 0 0 4px var(--ring)}
-  textarea{min-height:100px}
-  .field{display:grid;gap:6px;margin:10px 0}
-  .row{display:flex;gap:10px}
-  .row > *{flex:1}
-
-  /* Segmented (Oui/Non) */
-  .segmented{display:flex;gap:6px;padding:4px;background:#f1f7ff;border:1px solid var(--line);border-radius:12px}
-  .segmented input{display:none}
-  .segmented label{
-    flex:1;text-align:center;padding:10px 12px;border-radius:10px;font-weight:800;cursor:pointer;color:#64748b;
-    border:1px solid transparent; user-select:none;
-  }
-  .segmented input:checked + label{
-    background:linear-gradient(180deg,#eaf7ff,#dff2ff); color:#075985; border:1px solid #bfe7fb;
-    box-shadow:inset 0 0 0 1px rgba(14,165,233,.05);
-  }
-
-  /* Tags / statuses */
-  .tag{display:inline-flex;align-items:center;padding:6px 10px;border-radius:999px;border:1px solid var(--line);font-size:.85rem;background:#f7fbff}
-  .status{font-weight:900;letter-spacing:.2px}
-  .status.todo{color:var(--bad)} .status.doing{color:var(--warn)} .status.done{color:var(--ok)}
-  .list{display:grid;gap:10px}
-  .item{display:flex;align-items:center;gap:10px;justify-content:space-between;padding:10px;border:1px dashed #dfe8f3;border-radius:14px;background:#fff}
-  .qty{font-weight:900}
-  .chip{padding:8px 10px;border-radius:999px;background:#e6f7ff;border:1px solid #bee7fb;color:#075985;font-weight:800}
-  .danger{color:#b91c1c}
-  .divider{height:1px;background:linear-gradient(90deg,transparent,#e9f1fa,transparent);margin:10px 0}
-
-  /* ===== Screens / transitions ===== */
-  section[id^="screen-"]{display:none;transform:translateY(8px);opacity:0;transition:transform .25s ease, opacity .25s ease}
-  section[id^="screen-"].active{display:block;transform:translateY(0);opacity:1}
-
-  /* ===== Bottom tabbar ===== */
-  .tabbar{
-    position:fixed;left:0;right:0;bottom:0;z-index:40;background:#ffffffcc;
-    -webkit-backdrop-filter:blur(12px); backdrop-filter:blur(12px);
-    border-top:1px solid var(--line); box-shadow:0 -6px 20px rgba(2,6,23,.06);
-  }
-  .tabs{max-width:820px;margin:0 auto;padding:10px;display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
-  .tab{display:flex;flex-direction:column;align-items:center;gap:6px;padding:10px;border-radius:14px;border:1px solid transparent;text-align:center;font-size:.78rem;color:#0b2440}
-  .tab.active{border-color:#bfe7fb;background:linear-gradient(180deg,#eef9ff,#e6f6ff)}
-
-  .hidden{display:none !important}
-  .ring{box-shadow:0 0 0 4px var(--ring)}
-
-  /* ===== LOGIN ===== */
-  .login-hero{
-    position:relative; min-height:100vh; display:grid; place-items:center; padding:clamp(16px,4vw,32px)
-  }
-  .login-hero .bg{
-    position:absolute; inset:0; overflow:hidden; pointer-events:none; z-index:0;
-    background:radial-gradient(120% 120% at 0% 0%, #eef7ff 0%, #f7fbff 45%, #ffffff 100%);
-  }
-  .login-hero .blob{position:absolute; width:480px; height:480px; border-radius:999px; filter:blur(34px); opacity:.55; animation:float 14s ease-in-out infinite}
-  .login-hero .b1{left:-120px; top:-80px; background:radial-gradient(closest-side,#bfe9ff,#7dd3fc,#38bdf8)}
-  .login-hero .b2{right:-140px; bottom:-140px; background:radial-gradient(closest-side,#e0f2fe,#bae6fd,#7dd3fc)}
-  .login-hero .b3{left:38%; top:58%; width:360px; height:360px; background:radial-gradient(closest-side,#dbeafe,#bfdbfe,#93c5fd); animation-duration:18s}
-  @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
-
-  /* Carte “verre” + bordure dégradée — FIX clic */
-  .login-card{
-    position:relative; z-index:2; isolation:isolate;            /* crée un contexte de pile */
-    width:min(620px,94vw); padding:26px 22px; border-radius:28px;
-    background:linear-gradient(180deg,rgba(255,255,255,.75),rgba(255,255,255,.55));
-    border:1px solid rgba(56,189,248,.25);
-    -webkit-backdrop-filter:blur(10px); backdrop-filter:blur(10px);
-    box-shadow:0 20px 60px rgba(2,6,23,.12);
-  }
-  .login-card.fancy::before{
-    content:""; position:absolute; inset:-1px; border-radius:inherit; padding:1px;
-    background:linear-gradient(135deg,#bfe9ff,#7dd3fc 30%,#38bdf8 60%,#0ea5e9 100%);
-    -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-    -webkit-mask-composite:xor; mask-composite:exclude;
-    pointer-events:none;                                           /* ne bloque pas le clic */
-  }
-
-  .login-top{display:flex; gap:14px; align-items:center}
-  .logo-img{height:64px; width:auto; object-fit:contain; filter:drop-shadow(0 8px 18px rgba(2,6,23,.12))}
-  @media (min-width:768px){ .logo-img{height:72px} }
-  .login-titles h1{margin:2px 0 4px 0; font-size:1.6rem; letter-spacing:.2px}
-  .login-titles .accent{color:#0ea5e9}
-  .login-titles .mini{font-weight:800; letter-spacing:.18px}
-
-  /* Gros bouton Google */
-  .gbtn{
-    display:flex; align-items:center; justify-content:center; gap:10px;
-    width:100%; height:56px; border-radius:16px; cursor:pointer;
-    font-weight:800; font-size:1rem; letter-spacing:.2px;
-    background:linear-gradient(180deg,#ffffff,#f5faff);
-    border:1px solid #dbe9f6; color:#0b2440; box-shadow:0 10px 26px rgba(2,6,23,.10);
-    transition:transform .08s ease, box-shadow .2s ease, filter .15s ease;
-    position:relative; z-index:3; user-select:none; -webkit-tap-highlight-color:transparent;
-  }
-  .gbtn:hover{transform:translateY(-1px); box-shadow:0 14px 38px rgba(2,6,23,.16)}
-  .gbtn:active{transform:translateY(0)}
-  .g-icon{width:22px;height:22px; display:inline-block}
-  .g-arrow{margin-left:2px; transition:transform .15s ease}
-  .gbtn:hover .g-arrow{transform:translateX(3px)}
-  .login-meta{color:#637189; font-size:.9rem; text-align:center; margin-top:10px}
-</style>
-
-</head>
-<body>
-<header id="appHeader">
-  <div class="container nav">
-    <div class="brand"><div class="logo"></div> La Plage — Intranet</div>
-    <button id="backBtn" class="back">⟵ Retour</button>
-    <div id="rolePill" class="pill hidden"></div>
-    <div class="spacer"></div>
-    <button id="signinBtn" class="btn primary">Connexion Google</button>
-    <button id="signoutBtn" class="btn ghost hidden">Se déconnecter</button>
-  </div>
-</header>
-<!-- ===== ÉCRAN DE CONNEXION ===== -->
-
-<section id="screen-login" class="login active">
-  <div class="login-hero">
-    <div class="bg">
-      <span class="blob b1"></span>
-      <span class="blob b2"></span>
-      <span class="blob b3"></span>
-    </div>
-
-    <div class="login-card fancy">
-<div class="login-top">
-  <!-- Mets le logo dans ton repo et ajuste le chemin si besoin -->
-  <img class="logo-img" src="logo-camping-la-plage.png" alt="Camping La Plage — Argelès-sur-Mer" />
-  <div class="login-titles">
-    <div class="mini muted">Camping</div>
-    <h1>La Plage <span class="accent">Dashboard</span></h1>
-    <p class="muted">
-      Connectez-vous pour accéder à votre tableau de bord.
-    </p>
-  </div>
-</div>
-
-
-<button id="signinBig" class="gbtn" type="button" style="margin-top:14px">
-        <svg class="g-icon" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-          <path fill="#FFC107" d="M43.6 20.5H42v-.1H24v7.2h11.3C33.9 31.9 29.4 35 24 35c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.9 1.2 8 3.1l5.1-5.1C33.6 6 29 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.7-.4-3.9z"/>
-          <path fill="#FF3D00" d="M6.3 14.7l5.9 4.3C13.8 15.2 18.5 12 24 12c3.1 0 5.9 1.2 8 3.1l5.1-5.1C33.6 6 29 4 24 4 16.3 4 9.6 8.4 6.3 14.7z"/>
-          <path fill="#4CAF50" d="M24 44c5.3 0 10.2-2 13.8-5.2l-6.4-5.2C29.4 35 26.8 36 24 36c-5.3 0-9.7-3.6-11.3-8.4l-6.5 5C9.5 39.6 16.2 44 24 44z"/>
-          <path fill="#1976D2" d="M43.6 20.5H42v-.1H24v7.2h11.3c-1.1 3.3-3.6 6-6.7 7.4l6.4 5.2C38.4 38.4 44 33 44 24c0-1.3-.1-2.7-.4-3.5z"/>
-        </svg>
-        Se connecter avec Google
-        <span class="g-arrow">➜</span>
-      </button>
-
-      <div class="login-meta">Accès réservé au personnel. Vos droits dépendent de votre rôle.</div>
-    </div>
-  </div>
-</section>
-
-
-  <main class="container">
-    <!-- DASHBOARD -->
-    <section id="screen-dashboard" class="grid cards">
-      <div class="card">
-        <h3>Bienvenue 👋</h3>
-        <p class="muted">Sélectionnez une section ci-dessous. Votre rôle : <span id="roleLabel">—</span></p>
-        <div class="divider"></div>
-        <div id="quickLinks" class="grid cards"></div>
-      </div>
-      <div class="card">
-        <h3>Interventions récentes</h3>
-        <div id="recentInterventions" class="list"></div>
-      </div>
-    </section>
-
-    <!-- RECEPTION -->
-   <section id="screen-reception">
-  <!-- Carte création style “app” -->
-  <div class="card ring">
-    <div class="row" style="align-items:center;justify-content:space-between">
-      <h3 style="display:flex;align-items:center;gap:8px;margin:0">
-        <span style="font-size:1.2rem">➕</span> Nouvelle intervention
-      </h3>
-      <span class="subpill">Assignation auto selon type</span>
-    </div>
-
-    <div class="row">
-      <div class="field">
-        <label>Type</label>
-        <select id="i_type">
-          <option value="technique" selected>Technique</option>
-          <!-- Si un jour tu veux ouvrir aux tickets Ménage : <option value="menage">Ménage</option> -->
-        </select>
-      </div>
-      <div class="field">
-        <label>Priorité</label>
-        <select id="i_priority">
-          <option value="normale" selected>Normale</option>
-          <option value="urgente">Urgente</option>
-          <option value="basse">Basse</option>
-        </select>
-      </div>
-    </div>
-
-    <div class="field">
-      <label>Mobil Home</label>
-      <input id="i_mh" placeholder="Écrire… (ex: B12)" />
-    </div>
-
-    <div class="field">
-      <label>Détail</label>
-      <textarea id="i_details" placeholder="Décrivez le problème…"></textarea>
-    </div>
-
-    <div class="field">
-      <label>Clients présents ?</label>
-      <div class="segmented">
-        <input type="radio" id="present_oui" name="i_present" value="oui" checked>
-        <label for="present_oui">Oui</label>
-        <input type="radio" id="present_non" name="i_present" value="non">
-        <label for="present_non">Non</label>
-      </div>
-    </div>
-
-    <div class="field">
-      <label>Autorisation d'entrée ?</label>
-      <div class="segmented">
-        <input type="radio" id="ok_oui" name="i_ok" value="oui" checked>
-        <label for="ok_oui">Oui</label>
-        <input type="radio" id="ok_non" name="i_ok" value="non">
-        <label for="ok_non">Non</label>
-      </div>
-    </div>
-
-    <div class="row" style="margin-top:8px;justify-content:flex-end">
-      <button id="btnClearInter" class="btn">Réinitialiser</button>
-      <button id="btnCreateInter" class="btn primary">Créer</button>
-    </div>
-  </div>
-
-  <div class="card">
-    <div class="row" style="align-items:center;justify-content:space-between">
-      <h3>Interventions ouvertes</h3>
-      <div class="row" style="gap:8px;flex:0 0 auto">
-        <input id="searchInter" placeholder="Recherche (MH, détail, id)" style="min-width:180px"/>
-        <select id="statusFilter" style="flex:0 0 150px">
-          <option value="">Tous statuts</option>
-          <option value="todo">À faire</option>
-          <option value="doing">En cours</option>
-          <option value="done">Terminé</option>
-        </select>
-      </div>
-    </div>
-    <div id="receptionInterventions" class="list"></div>
-  </div>
-</section>
-
-    <!-- TECHNIQUE -->
-    <section id="screen-tech">
-      <div class="card">
-        <h3>Interventions (Technique)</h3>
-        <div id="techInterventions" class="list"></div>
-      </div>
-    </section>
-
-    <!-- MENAGE -->
-    <section id="screen-menage">
-      <div class="card">
-        <h3>Informations / tâches Ménage</h3>
-        <p class="muted">(À adapter si vous souhaitez des tickets spécifiques ménage)</p>
-        <div id="menageInfo" class="list"></div>
-      </div>
-    </section>
-
-    <!-- ADMIN -->
-    <section id="screen-admin">
-      <div class="card ring">
-        <h3>Gestion des rôles</h3>
-        <p class="muted">Attribuez un rôle aux salariés connectés au moins une fois. Les utilisateurs apparaissent automatiquement dans la liste ci-dessous après leur première connexion.</p>
-        <div class="field">
-          <label>Filtrer par nom / email</label>
-          <input id="userSearch" placeholder="Rechercher…" />
-        </div>
-        <div id="userList" class="list"></div>
-      </div>
-    </section>
-
-    <!-- INVENTAIRES -->
-    <section id="screen-inventory-tech">
-      <div class="card ring">
-        <h3>Inventaire — Technique</h3>
-        <div class="row">
-          <input id="it_name" placeholder="Nouvel objet…"/>
-          <input id="it_qty" type="number" inputmode="numeric" placeholder="Qté"/>
-          <button id="it_add" class="btn primary small">Ajouter</button>
-        </div>
-        <div id="it_list" class="list" style="margin-top:10px"></div>
-      </div>
-    </section>
-
-    <section id="screen-inventory-menage">
-      <div class="card ring">
-        <h3>Inventaire — Ménage</h3>
-        <div class="row">
-          <input id="im_name" placeholder="Nouvel objet…"/>
-          <input id="im_qty" type="number" inputmode="numeric" placeholder="Qté"/>
-          <button id="im_add" class="btn primary small">Ajouter</button>
-        </div>
-        <div id="im_list" class="list" style="margin-top:10px"></div>
-      </div>
-    </section>
-
-    <!-- ACCESS DENIED -->
-    <section id="screen-denied">
-      <div class="card">
-        <h3>Accès restreint</h3>
-        <p class="muted">Demandez à l'administrateur de vous attribuer un rôle.</p>
-      </div>
-    </section>
-  </main>
-
-  <!-- Bottom Tabbar -->
-  <nav id="tabbar" class="tabbar hidden">
-    <div id="tabs" class="tabs"></div>
-  </nav>
-
-  <footer>
-    <div class="container">© <span id="year"></span> Camping La Plage — Accès équipes</div>
-  </footer>
-
-  <!-- Firebase (Compat SDK) -->
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
-
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>La Plage – Dashboard</title>
+  <meta name="theme-color" content="#e6f4ff" />
+  <!-- Tailwind via CDN (mobile-first, no build step) -->
+  <script src="https://cdn.tailwindcss.com"></script>
   <script>
-  // --- Config
-  const firebaseConfig = {
-    apiKey: "AIzaSyDEVzQfz8loSf2HDzU_YcBvIgH1Fx9_fnw",
-    authDomain: "dashboard-v4-2ef47.firebaseapp.com",
-    projectId: "dashboard-v4-2ef47",
-    storageBucket: "dashboard-v4-2ef47.firebasestorage.app",
-    messagingSenderId: "179267988381",
-    appId: "1:179267988381:web:644c3a2dc713ed9bca1d74"
-  };
-
-  // Références (évite la TDZ des const)
-  let auth, db, currentUser = null, currentRole = null;
-  let unsubInter=null, unsubTech=null, unsubTechView=null, unsubIT=null, unsubIM=null, unsubUsers=null;
-
-  const $ = (id)=>document.getElementById(id);
-
-  function initFirebaseOnce() {
-    if (!firebase.apps || !firebase.apps.length) {
-      firebase.initializeApp(firebaseConfig);
-    }
-    auth = firebase.auth();
-    db   = firebase.firestore();
-  }
-
-  async function doGoogleSignIn(e){
-    if (e) { e.preventDefault(); e.stopPropagation(); }
-    const provider = new firebase.auth.GoogleAuthProvider();
-    provider.setCustomParameters({ prompt: 'select_account' });
-    try {
-      await auth.signInWithPopup(provider);
-    } catch (err) {
-      if (['auth/popup-blocked','auth/cancelled-popup-request','auth/operation-not-supported-in-this-environment'].includes(err.code)) {
-        await auth.signInWithRedirect(provider);
-      } else {
-        alert('Connexion impossible : ' + (err.message || err.code));
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            skybrand: {
+              50: '#f0f9ff', 100: '#e0f2ff', 200: '#bae6fd', 300: '#7dd3fc',
+              400: '#38bdf8', 500: '#0ea5e9', 600: '#0284c7', 700: '#0369a1',
+              800: '#075985', 900: '#0c4a6e'
+            }
+          },
+          boxShadow: { soft: '0 10px 25px -10px rgba(2, 132, 199, 0.25)' }
+        }
       }
     }
-  }
+  </script>
+  <style>
+    /* Mobile-first helpers */
+    .card { @apply bg-white rounded-2xl shadow-soft p-4; }
+    .btn  { @apply rounded-xl px-4 py-3 font-semibold active:scale-95 transition; }
+    .btn-primary { @apply bg-skybrand-500 text-white; }
+    .btn-outline { @apply border border-skybrand-500 text-skybrand-700; }
+    .chip { @apply inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-medium; }
+    .chip.todo { @apply bg-skybrand-100 text-skybrand-800; }
+    .chip.doing { @apply bg-yellow-100 text-yellow-800; }
+    .chip.done { @apply bg-emerald-100 text-emerald-800; }
+    .chip.lock { @apply bg-gray-100 text-gray-700; }
+    .hide { display:none; }
+  </style>
+</head>
+<body class="min-h-screen bg-skybrand-50 text-skybrand-900">
+  <!-- Top bar -->
+  <header class="sticky top-0 z-40 bg-skybrand-50/80 backdrop-blur border-b border-skybrand-100">
+    <div class="max-w-xl mx-auto flex items-center justify-between p-3">
+      <div class="flex items-center gap-3">
+        <img src="logo-la-plage.png" alt="La Plage" class="h-8 w-8 rounded-full"/>
+        <h1 class="text-lg font-extrabold tracking-tight">La Plage – Dashboard</h1>
+      </div>
+      <div id="userBadge" class="flex items-center gap-2 text-sm"></div>
+    </div>
+  </header>
 
-  // ==== Tout démarre ici, une fois le DOM prêt
-  document.addEventListener('DOMContentLoaded', () => {
-    initFirebaseOnce();               // <-- auth et db sont prêts ici
+  <!-- LOGIN PAGE (only Google button + logo + welcome message) -->
+  <main id="page-login" class="max-w-xl mx-auto p-6 flex flex-col gap-6">
+    <div class="card text-center">
+      <img src="logo-la-plage.png" alt="La Plage" class="mx-auto h-20 w-20 mb-3"/>
+      <h2 class="text-2xl font-bold">Bienvenue sur le dashboard du camping La Plage</h2>
+      <p class="mt-2 text-skybrand-700">Accédez avec votre compte Google pour continuer.</p>
+      <button id="btnGoogle" class="btn btn-primary mt-6 w-full flex items-center justify-center gap-3">
+        <svg aria-hidden="true" viewBox="0 0 512 512" class="h-5 w-5"><path fill="currentColor" d="M272 208v96h133c-6 35-40 104-133 104-80 0-145-66-145-146s65-146 145-146c45 0 75 19 92 35l63-61C377 62 327 40 272 40 141 40 36 145 36 276s105 236 236 236c136 0 226-96 226-232 0-16-2-27-4-40H272z"/></svg>
+        Continuer avec Google
+      </button>
+    </div>
+  </main>
 
-    // Brancher les boutons maintenant que doGoogleSignIn peut utiliser auth
-    ['signinBtn','signinBig'].forEach(id=>{
-      const el = $(id);
-      if (el) el.addEventListener('click', doGoogleSignIn);
+  <!-- APP SHELL (shown when authenticated) -->
+  <section id="app" class="hide max-w-xl mx-auto p-4 pb-24">
+
+    <!-- Role-aware tabs (only relevant tabs appear) -->
+    <nav id="tabbar" class="fixed bottom-0 left-0 right-0 bg-white border-t border-skybrand-100">
+      <div class="max-w-xl mx-auto grid grid-cols-4 gap-1 p-2 text-xs">
+        <button data-tab="home" class="btn btn-outline">Accueil</button>
+        <button data-tab="reception" class="btn btn-outline hide">Réception</button>
+        <button data-tab="tech" class="btn btn-outline hide">Technique</button>
+        <button data-tab="clean" class="btn btn-outline hide">Ménage</button>
+        <button data-tab="inventory-tech" class="btn btn-outline hide">Invent. Tech</button>
+        <button data-tab="inventory-clean" class="btn btn-outline hide">Invent. Ménage</button>
+        <button data-tab="admin" class="btn btn-outline hide">Admin</button>
+        <button id="btnSignOut" class="btn btn-primary">Quitter</button>
+      </div>
+    </nav>
+
+    <!-- HOME / DASHBOARD -->
+    <section id="tab-home" class="tab p-2 mt-2">
+      <div class="card">
+        <h2 class="text-xl font-bold">Tableau de bord</h2>
+        <p class="mt-1 text-sm">Vous êtes connecté en tant que <span id="roleLabel" class="font-semibold"></span>.</p>
+        <div class="mt-4 grid gap-3">
+          <div class="card bg-skybrand-50">
+            <h3 class="font-semibold">Interventions en cours (Technique)</h3>
+            <ul id="dashTechList" class="mt-2 text-sm grid gap-2"></ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- RÉCEPTION: créer des interventions (technique) -->
+    <section id="tab-reception" class="tab hide p-2">
+      <div class="card">
+        <h2 class="text-lg font-bold mb-3">Nouvelle intervention (Technique)</h2>
+        <form id="formReception" class="grid gap-3">
+          <label class="grid gap-1">
+            <span>N° Mobil-home</span>
+            <input name="mh" required inputmode="numeric" class="w-full rounded-xl border p-3" placeholder="ex: 42" />
+          </label>
+          <label class="grid gap-1">
+            <span>Détail de l'intervention</span>
+            <textarea name="detail" class="w-full rounded-xl border p-3" placeholder="Décrivez le problème..."></textarea>
+          </label>
+          <div class="grid grid-cols-2 gap-3">
+            <label class="flex items-center gap-2"><input type="checkbox" name="present"/> Clients présents</label>
+            <label class="flex items-center gap-2"><input type="checkbox" name="authorized"/> Autorisation d'entrée</label>
+          </div>
+          <button class="btn btn-primary w-full">Créer l'intervention</button>
+        </form>
+      </div>
+
+      <div class="card mt-4">
+        <h3 class="font-semibold">Toutes les interventions</h3>
+        <ul id="receptionList" class="mt-2 grid gap-2"></ul>
+      </div>
+    </section>
+
+    <!-- TECHNIQUE: voir & traiter interventions -->
+    <section id="tab-tech" class="tab hide p-2">
+      <div class="card">
+        <h2 class="text-lg font-bold">Interventions</h2>
+        <div class="flex gap-2 mt-2 text-sm">
+          <button class="btn btn-outline" data-filter="all">Toutes</button>
+          <button class="btn btn-outline" data-filter="todo">À faire</button>
+          <button class="btn btn-outline" data-filter="doing">En cours</button>
+          <button class="btn btn-outline" data-filter="done">Terminées</button>
+        </div>
+        <ul id="techList" class="mt-3 grid gap-3"></ul>
+      </div>
+    </section>
+
+    <!-- MÉNAGE: placeholder pour éventuelles interventions ménage (lecture seule ici) -->
+    <section id="tab-clean" class="tab hide p-2">
+      <div class="card">
+        <h2 class="text-lg font-bold">Informations ménage</h2>
+        <p class="text-sm">Aucune intervention spécifique n'est requise ici pour l'instant.</p>
+      </div>
+    </section>
+
+    <!-- INVENTAIRE TECHNIQUE -->
+    <section id="tab-inventory-tech" class="tab hide p-2">
+      <div class="card">
+        <h2 class="text-lg font-bold">Inventaire – Technique</h2>
+        <form id="formInvTech" class="mt-2 grid grid-cols-3 gap-2">
+          <input name="name" class="col-span-2 rounded-xl border p-3" placeholder="Nom de l'objet"/>
+          <input name="qty" type="number" value="1" class="rounded-xl border p-3"/>
+          <button class="btn btn-primary col-span-3">Ajouter</button>
+        </form>
+        <ul id="listInvTech" class="mt-3 grid gap-2"></ul>
+      </div>
+    </section>
+
+    <!-- INVENTAIRE MÉNAGE -->
+    <section id="tab-inventory-clean" class="tab hide p-2">
+      <div class="card">
+        <h2 class="text-lg font-bold">Inventaire – Ménage</h2>
+        <form id="formInvClean" class="mt-2 grid grid-cols-3 gap-2">
+          <input name="name" class="col-span-2 rounded-xl border p-3" placeholder="Nom de l'objet"/>
+          <input name="qty" type="number" value="1" class="rounded-xl border p-3"/>
+          <button class="btn btn-primary col-span-3">Ajouter</button>
+        </form>
+        <ul id="listInvClean" class="mt-3 grid gap-2"></ul>
+      </div>
+    </section>
+
+    <!-- ADMIN: gestion des comptes & rôles -->
+    <section id="tab-admin" class="tab hide p-2">
+      <div class="card">
+        <h2 class="text-lg font-bold">Administration – Comptes & rôles</h2>
+        <p class="text-sm">Attribuez un rôle aux salariés déjà connectés au moins une fois.</p>
+        <ul id="usersList" class="mt-3 grid gap-2"></ul>
+      </div>
+    </section>
+
+  </section>
+
+  <!-- Firebase + App Logic -->
+  <script type="module">
+    // --- Config (fourni par vous)
+    const firebaseConfig = {
+      apiKey: "AIzaSyDEVzQfz8loSf2HDzU_YcBvIgH1Fx9_fnw",
+      authDomain: "dashboard-v4-2ef47.firebaseapp.com",
+      projectId: "dashboard-v4-2ef47",
+      storageBucket: "dashboard-v4-2ef47.firebasestorage.app",
+      messagingSenderId: "179267988381",
+      appId: "1:179267988381:web:644c3a2dc713ed9bca1d74"
+    };
+
+    // Import Firebase (v10+ modular)
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
+    import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
+    import { getFirestore, doc, getDoc, setDoc, updateDoc, onSnapshot, addDoc, collection, query, where, orderBy, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+
+    // Init
+    const appFb = initializeApp(firebaseConfig);
+    const auth = getAuth(appFb);
+    const db = getFirestore(appFb);
+
+    // UI helpers
+    const $ = (sel) => document.querySelector(sel);
+    const $$ = (sel) => Array.from(document.querySelectorAll(sel));
+    const show = el => el.classList.remove('hide');
+    const hide = el => el.classList.add('hide');
+
+    // Pages / tabs
+    const pageLogin = $('#page-login');
+    const app = $('#app');
+    const userBadge = $('#userBadge');
+
+    const roleTabs = {
+      reception: $('[data-tab="reception"]'),
+      tech: $('[data-tab="tech"]'),
+      clean: $('[data-tab="clean"]'),
+      invTech: $('[data-tab="inventory-tech"]'),
+      invClean: $('[data-tab="inventory-clean"]'),
+      admin: $('[data-tab="admin"]')
+    };
+
+    function switchTab(id){
+      $$('.tab').forEach(t => hide(t));
+      $(`#tab-${id}`).classList.remove('hide');
+      // Persist current tab
+      localStorage.setItem('lp_tab', id);
+    }
+
+    // Tabbar click
+    $('#tabbar').addEventListener('click', (e)=>{
+      const b = e.target.closest('button[data-tab]');
+      if(!b) return;
+      switchTab(b.dataset.tab);
     });
 
-    // ---- Observer la session (utilise auth après init)
-    auth.onAuthStateChanged(async (user) => {
-      currentUser = user || null;
+    // Login
+    $('#btnGoogle').addEventListener('click', async ()=>{
+      const provider = new GoogleAuthProvider();
+      try {
+        await signInWithPopup(auth, provider);
+      } catch (err) {
+        alert('Connexion Google refusée.');
+        console.error(err);
+      }
+    });
 
-      if (!user) {
-        // Stopper écoutes / reset UI
-        [unsubInter,unsubTech,unsubTechView,unsubIT,unsubIM,unsubUsers].forEach(u=>u && u());
-        unsubInter=unsubTech=unsubTechView=unsubIT=unsubIM=unsubUsers=null;
+    // Sign out
+    $('#btnSignOut').addEventListener('click', ()=> signOut(auth));
 
-        currentRole = null;
-        $('signoutBtn')?.classList.add('hidden');
-        $('signinBtn')?.classList.remove('hidden');
-        $('rolePill')?.classList.add('hidden');
-        const rp = $('rolePill'); if (rp) rp.textContent='';
-        const rl = $('roleLabel'); if (rl) rl.textContent='—';
-        const ql = $('quickLinks'); if (ql) ql.innerHTML='';
-        const ri = $('recentInterventions'); if (ri) ri.innerHTML='';
-        $('tabbar')?.classList.add('hidden');
+    // Current user state + role loading
+    let unsubIntervReception = null;
+    let unsubIntervTech = null;
+    let unsubDashTech = null;
+    let unsubUsers = null;
 
-        const hdr = $('appHeader'); if (hdr) hdr.style.display='none';
-        const big = $('signinBig'); if (big) big.onclick = doGoogleSignIn;
+    const ROLES = ['admin','reception','tech','clean'];
 
-        route('screen-login');
+    onAuthStateChanged(auth, async (user)=>{
+      if(!user){
+        // Logged out
+        show(pageLogin); hide(app);
+        userBadge.innerHTML = '';
         return;
       }
 
-      // Connecté
-      const hdr = $('appHeader'); if (hdr) hdr.style.display='';
-      $('signoutBtn')?.classList.remove('hidden');
-      $('signinBtn')?.classList.add('hidden');
-
-      // Profil (tolère l’échec)
-      try {
-        await db.collection('users').doc(user.uid).set({
-          uid:user.uid,
-          displayName:user.displayName || '',
-          email:user.email || '',
-          photoURL:user.photoURL || '',
-          updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-        }, { merge:true });
-      } catch(e){ console.warn('[users.set]', e); }
-
-      // Rôle (tolère l’échec)
-      try {
-        const roleSnap = await db.collection('roles').doc(user.uid).get();
-        currentRole = roleSnap.exists ? (roleSnap.data().role || null) : null;
-      } catch(e){ console.warn('[roles.get]', e); currentRole = null; }
-
-      const rl = $('roleLabel'); if (rl) rl.textContent = currentRole || 'non défini';
-      const pill = $('rolePill');
-      if (pill) {
-        pill.textContent = (user.displayName||user.email) + (currentRole ? ' — ' + currentRole.toUpperCase() : ' — rôle à attribuer');
-        pill.classList.remove('hidden');
+      // First login: create profile doc if missing
+      const uref = doc(db, 'users', user.uid);
+      const snap = await getDoc(uref);
+      if(!snap.exists()){
+        await setDoc(uref, {
+          email: user.email || null,
+          displayName: user.displayName || null,
+          photoURL: user.photoURL || null,
+          role: 'reception', // rôle par défaut minimal
+          createdAt: serverTimestamp()
+        });
       }
 
-      try { buildDashboard(); wireRealtime(); }
-      catch(e){ console.warn('[wireRealtime]', e); }
+      // Read role
+      const role = (await getDoc(uref)).data().role || 'reception';
 
-      route('screen-dashboard');
-    });
-  });
+      // UI toggle
+      hide(pageLogin); show(app);
+      userBadge.innerHTML = `
+        <img src="${user.photoURL || ''}" class="h-6 w-6 rounded-full" alt=""/>
+        <span class="hidden sm:inline">${user.displayName || user.email}</span>
+      `;
+      $('#roleLabel').textContent = role;
 
-    // 5) DASHBOARD + onglets bas selon rôle
-    function buildDashboard(){
-      const links = [];
-      if(!currentUser){ route('screen-dashboard'); return; }
-      const tabs = [];
-
-      if(currentRole==='admin'){
-        links.push({t:'Administration',scr:'screen-admin'});
-        links.push({t:'Réception — Interventions',scr:'screen-reception'});
-        links.push({t:'Technique — Interventions',scr:'screen-tech'});
-        links.push({t:'Inventaire Technique',scr:'screen-inventory-tech'});
-        links.push({t:'Inventaire Ménage',scr:'screen-inventory-menage'});
-        tabs.push('screen-dashboard','screen-admin','screen-reception','screen-tech','screen-inventory-tech');
-      } else if(currentRole==='reception'){
-        links.push({t:'Réception — Interventions',scr:'screen-reception'});
-        tabs.push('screen-dashboard','screen-reception');
-      } else if(currentRole==='technique'){
-        links.push({t:'Technique — Interventions',scr:'screen-tech'});
-        links.push({t:'Inventaire Technique',scr:'screen-inventory-tech'});
-        tabs.push('screen-dashboard','screen-tech','screen-inventory-tech');
-      } else if(currentRole==='menage'){
-        links.push({t:'Ménage — Tableau',scr:'screen-menage'});
-        links.push({t:'Inventaire Ménage',scr:'screen-inventory-menage'});
-        tabs.push('screen-dashboard','screen-menage','screen-inventory-menage');
-      } else {
-        links.push({t:"Accès restreint — contacter l'admin", scr:'screen-denied'});
+      // Show tabs by role
+      Object.values(roleTabs).forEach(hide);
+      // Everyone gets Home and Sign out; role-specific below
+      if(role==='admin'){
+        show(roleTabs.reception); show(roleTabs.tech); show(roleTabs.clean);
+        show(roleTabs.invTech); show(roleTabs.invClean); show(roleTabs.admin);
+      } else if(role==='reception'){
+        show(roleTabs.reception); show(roleTabs.invTech); show(roleTabs.invClean);
+      } else if(role==='tech'){
+        show(roleTabs.tech); show(roleTabs.invTech);
+      } else if(role==='clean'){
+        show(roleTabs.clean); show(roleTabs.invClean);
       }
 
-      $('quickLinks').innerHTML = links.map(l=>`<a class="btn" data-goto="${l.scr}">${l.t}</a>`).join('');
-      Array.from(document.querySelectorAll('[data-goto]')).forEach(a=>{
-        a.onclick=()=>{ route(a.dataset.goto); selectTab(a.dataset.goto); }
+      // Restore last tab (or default)
+      const last = localStorage.getItem('lp_tab') || (role==='reception'?'reception':role==='tech'?'tech':role==='admin'?'admin':'home');
+      switchTab(last);
+
+      // Live dashboard (tech in-progress)
+      if(unsubDashTech) unsubDashTech();
+      unsubDashTech = onSnapshot(query(collection(db,'interventions'), where('type','==','tech'), where('locked','==', false)), (qs)=>{
+        const ul = $('#dashTechList'); ul.innerHTML='';
+        qs.forEach(docu=>{
+          const it = docu.data();
+          const li = document.createElement('li');
+          li.className = 'flex items-center justify-between gap-2 rounded-xl border p-3 bg-white';
+          li.innerHTML = `
+            <div>
+              <div class="font-semibold">MH ${it.mh} – ${it.detail || ''}</div>
+              <div class="text-xs opacity-80">Présents: ${it.present? 'oui':'non'} · Entrée: ${it.authorized? 'oui':'non'}</div>
+            </div>
+            <span class="chip ${it.status==='todo'?'todo':it.status==='doing'?'doing':'done'}">
+              ${it.status==='todo'?'À faire':it.status==='doing'?'En cours':'Terminée'}
+            </span>`;
+          ul.appendChild(li);
+        });
       });
 
-      // Bottom tabs
-      if(tabs.length){
-        const mapTitle = {
-          'screen-dashboard':'Accueil','screen-admin':'Admin','screen-reception':'Réception',
-          'screen-tech':'Technique','screen-menage':'Ménage','screen-inventory-tech':'Inv. Tech',
-          'screen-inventory-menage':'Inv. Ménage'
+      // Wire pages depending on role
+      wireReception(role);
+      wireTech(role, user);
+      wireAdmin(role, user);
+      wireInventories(role);
+    });
+
+    // ===== Reception logic =====
+    function wireReception(role){
+      if(role!=='reception' && role!=='admin') return;
+
+      const form = $('#formReception');
+      form.addEventListener('submit', async (e)=>{
+        e.preventDefault();
+        const fd = new FormData(form);
+        const payload = {
+          type: 'tech',
+          mh: (fd.get('mh')||'').toString().trim(),
+          detail: (fd.get('detail')||'').toString().trim(),
+          present: !!fd.get('present'),
+          authorized: !!fd.get('authorized'),
+          status: 'todo',
+          locked: false,
+          createdAt: serverTimestamp()
         };
-        $('tabs').innerHTML = tabs.map(scr=>`<button class="tab" data-tab="${scr}">${mapTitle[scr]}</button>`).join('');
-        $('tabbar').classList.remove('hidden');
-        document.querySelectorAll('[data-tab]').forEach(t=>{
-          t.onclick=()=>{ document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active')); t.classList.add('active'); route(t.dataset.tab); };
+        if(!payload.mh){ alert('Numéro de mobil-home requis'); return; }
+        await addDoc(collection(db,'interventions'), payload);
+        form.reset();
+      });
+
+      // List all interventions (for reception)
+      if(unsubIntervReception) unsubIntervReception();
+      unsubIntervReception = onSnapshot(query(collection(db,'interventions'), orderBy('createdAt','desc')), (qs)=>{
+        const ul = $('#receptionList'); ul.innerHTML='';
+        qs.forEach(docu=>{
+          const it = {id: docu.id, ...docu.data()};
+          const li = document.createElement('li');
+          li.className = 'rounded-xl border p-3 bg-white';
+          li.innerHTML = `
+            <div class="flex items-center justify-between">
+              <div class="font-semibold">MH ${it.mh} – ${it.detail || ''}</div>
+              <span class="chip ${it.locked?'lock':it.status==='todo'?'todo':it.status==='doing'?'doing':'done'}">
+                ${it.locked?'Validée': it.status==='todo'?'À faire':it.status==='doing'?'En cours':'Terminée'}
+              </span>
+            </div>
+            <div class="mt-1 text-xs opacity-80">Clients présents: ${it.present? 'oui':'non'} · Autorisation: ${it.authorized? 'oui':'non'}</div>
+            ${it.locked && it.validatedByName ? `<div class='mt-1 text-xs'>Validée par <b>${it.validatedByName}</b></div>`:''}
+          `;
+          ul.appendChild(li);
         });
-        document.querySelector('[data-tab]')?.classList.add('active');
-      } else {
-        $('tabbar').classList.add('hidden');
-      }
-
-      route('screen-dashboard'); selectTab('screen-dashboard');
+      });
     }
 
-    // 6) TEMPS RÉEL
-function wireRealtime(){
-  // Dashboard — interventions récentes
-  unsubInter && unsubInter();
-  unsubInter = db.collection('interventions').orderBy('createdAt','desc').limit(10)
-    .onSnapshot(snap=>{
-      $('recentInterventions').innerHTML = snap.empty
-        ? '<span class="muted">Aucune intervention</span>'
-        : snap.docs.map(d=>renderInterCard(d.data(), d.id, {compact:true})).join('');
-    });
+    // ===== Technique logic =====
+    function wireTech(role, user){
+      if(role!=='tech' && role!=='admin') return;
 
-  // Réception — liste interventions (Technique)
-  unsubTech && unsubTech();
-  unsubTech = db.collection('interventions').where('team','==','technique').orderBy('createdAt','desc')
-    .onSnapshot(snap=>{
-      $('receptionInterventions').innerHTML = snap.empty
-        ? '<span class="muted">—</span>'
-        : snap.docs.map(d=>renderInterCard(d.data(), d.id, {showReception:true})).join('');
-      bindInterButtons();
-    });
-
-  // Technique — même source, affichée dans l’écran Technique
-  unsubTechView && unsubTechView();
-  unsubTechView = db.collection('interventions').where('team','==','technique').orderBy('createdAt','desc')
-    .onSnapshot(snap=>{
-      $('techInterventions').innerHTML = snap.empty
-        ? '<span class="muted">Aucune</span>'
-        : snap.docs.map(d=>renderInterCard(d.data(), d.id)).join('');
-      bindInterButtons();
-    });
-
-  // Inventaire Technique
-  unsubIT && unsubIT();
-  unsubIT = db.collection('inventaires').doc('technique').collection('items').orderBy('name')
-    .onSnapshot(snap=>{
-      $('it_list').innerHTML = snap.empty
-        ? '<span class="muted">Aucun objet</span>'
-        : snap.docs.map(doc=>renderInvItem(doc.id, doc.data(), 'technique')).join('');
-      bindInvButtons('technique');
-    });
-
-  // Inventaire Ménage
-  unsubIM && unsubIM();
-  unsubIM = db.collection('inventaires').doc('menage').collection('items').orderBy('name')
-    .onSnapshot(snap=>{
-      $('im_list').innerHTML = snap.empty
-        ? '<span class="muted">Aucun objet</span>'
-        : snap.docs.map(doc=>renderInvItem(doc.id, doc.data(), 'menage')).join('');
-      bindInvButtons('menage');
-    });
-
-  // Admin — utilisateurs
-  unsubUsers && unsubUsers();
-  unsubUsers = db.collection('users').orderBy('displayName')
-    .onSnapshot(snap=>{
-      const q = ($('userSearch').value||'').toLowerCase();
-      const rows = [];
-      snap.forEach(doc=>{
-        const u = doc.data();
-        if(q && !(u.displayName||'').toLowerCase().includes(q) && !(u.email||'').toLowerCase().includes(q)) return;
-        rows.push(u);
+      const ul = $('#techList');
+      let currentFilter = 'all';
+      $('#tab-tech').addEventListener('click', (e)=>{
+        const b = e.target.closest('button[data-filter]');
+        if(b){ currentFilter = b.dataset.filter; render(); }
       });
-      renderUserList(rows);
-    });
-}
 
-
-    // 7) CRÉER INTERVENTION
-    $('btnCreateInter').onclick = async ()=>{
-    if(!currentUser) return alert('Connectez-vous');
-    if(!(currentRole==='reception' || currentRole==='admin')) return alert('Accès réception requis');
-
-    const present = (document.querySelector('input[name="i_present"]:checked')?.value === 'oui');
-    const authorize = (document.querySelector('input[name="i_ok"]:checked')?.value === 'oui');
-
-    const data = {
-      type: $('i_type').value,                 // "technique" (par défaut)
-      priority: $('i_priority').value,         // "normale" | "urgente" | "basse"
-      mh: $('i_mh').value.trim(),
-      status: 'todo',                          // statut initial logique
-      present, authorize,
-      details: $('i_details').value.trim(),
-      team: 'technique',                       // assignation utilisée actuellement
-      createdBy: {uid: currentUser.uid, name: currentUser.displayName || currentUser.email},
-      validatedBy: null,
-      createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-    };
-
-    if(!data.mh) return alert('N° Mobil-home requis');
-    await db.collection('interventions').add(data);
-
-    // Reset
-    $('i_type').value = 'technique';
-    $('i_priority').value = 'normale';
-    ['i_mh','i_details'].forEach(id=>$(id).value='');
-    document.getElementById('present_oui').checked = true;
-    document.getElementById('ok_oui').checked = true;
-
-    alert('Intervention enregistrée');
-  };
-
-  $('btnClearInter').onclick = ()=>{
-    $('i_type').value = 'technique';
-    $('i_priority').value = 'normale';
-    ['i_mh','i_details'].forEach(id=>$(id).value='');
-    document.getElementById('present_oui').checked = true;
-    document.getElementById('ok_oui').checked = true;
-  };
-
-    // 8) INVENTAIRE
-    $('it_add').onclick = ()=> addInv('technique', $('it_name').value, Number($('it_qty').value||0));
-    $('im_add').onclick = ()=> addInv('menage', $('im_name').value, Number($('im_qty').value||0));
-
-    async function addInv(team, name, qty){
-      if(!currentUser) return alert('Connectez-vous');
-      if(!(currentRole===team || currentRole==='admin')) return alert('Accès '+team+' requis');
-      name = (name||'').trim(); if(!name) return alert('Nom requis');
-      qty = isNaN(qty)?0:qty;
-      const ref = db.collection('inventaires').doc(team).collection('items').doc(name.toLowerCase());
-      await db.runTransaction(async (t)=>{
-        const snap = await t.get(ref);
-        const cur = snap.exists? (snap.data().qty||0) : 0;
-        t.set(ref, {name, qty: cur + qty, updatedAt: firebase.firestore.FieldValue.serverTimestamp()}, {merge:true});
+      let items = [];
+      if(unsubIntervTech) unsubIntervTech();
+      unsubIntervTech = onSnapshot(query(collection(db,'interventions'), where('type','==','tech'), orderBy('createdAt','desc')), (qs)=>{
+        items = qs.docs.map(d=>({ id:d.id, ...d.data() }));
+        render();
       });
-      if(team==='technique'){ $('it_name').value=''; $('it_qty').value=''; } else { $('im_name').value=''; $('im_qty').value=''; }
-    }
 
-    function bindInvButtons(team){
-      document.querySelectorAll(`[data-inv-action][data-team="${team}"]`).forEach(btn=>{
-        btn.onclick = async ()=>{
-          if(!(currentRole===team || currentRole==='admin')) return alert('Accès '+team+' requis');
-          const id = btn.dataset.id; const act = btn.dataset.invAction;
-          const ref = db.collection('inventaires').doc(team).collection('items').doc(id);
-          if(act==='del'){
-            const ok = confirm('Supprimer cet objet ?'); if(!ok) return;
-            await ref.delete();
-          } else {
-            const delta = act==='plus'? 1 : -1;
-            await db.runTransaction(async (t)=>{
-              const snap = await t.get(ref);
-              if(!snap.exists) return;
-              let q = (snap.data().qty||0) + delta; if(q<0) q=0;
-              t.update(ref,{qty:q, updatedAt: firebase.firestore.FieldValue.serverTimestamp()});
+      function render(){
+        ul.innerHTML='';
+        items
+          .filter(it=> currentFilter==='all' ? true : currentFilter==='done' ? it.status==='done' : currentFilter==='doing' ? it.status==='doing' : it.status==='todo')
+          .forEach(it=>{
+            const li = document.createElement('li');
+            li.className = 'card';
+            li.innerHTML = `
+              <div class="flex items-center justify-between">
+                <div>
+                  <div class="font-semibold">MH ${it.mh}</div>
+                  <div class="text-sm opacity-80">${it.detail || ''}</div>
+                  <div class="text-xs mt-1 opacity-80">Présents: ${it.present?'oui':'non'} · Entrée: ${it.authorized?'oui':'non'}</div>
+                </div>
+                <div>
+                  <span class="chip ${it.locked?'lock':it.status==='todo'?'todo':it.status==='doing'?'doing':'done'}">
+                    ${it.locked?'Validée': it.status==='todo'?'À faire':it.status==='doing'?'En cours':'Terminée'}
+                  </span>
+                </div>
+              </div>
+              <div class="mt-3 grid grid-cols-3 gap-2">
+                <button class="btn btn-outline" data-act="status" data-to="todo" ${it.locked?'disabled':''}>À faire</button>
+                <button class="btn btn-outline" data-act="status" data-to="doing" ${it.locked?'disabled':''}>En cours</button>
+                <button class="btn btn-outline" data-act="status" data-to="done" ${it.locked?'disabled':''}>Terminée</button>
+                <button class="btn btn-primary col-span-3" data-act="validate" ${it.locked?'disabled':''}>Valider l'intervention</button>
+              </div>
+            `;
+
+            li.addEventListener('click', async (e)=>{
+              const b = e.target.closest('button[data-act]'); if(!b) return;
+              if(b.dataset.act==='status'){
+                if(it.locked) return;
+                await updateDoc(doc(db,'interventions', it.id), { status: b.dataset.to });
+              }
+              if(b.dataset.act==='validate'){
+                if(it.locked) return;
+                await updateDoc(doc(db,'interventions', it.id), {
+                  locked: true,
+                  validatedBy: user.uid,
+                  validatedByName: auth.currentUser?.displayName || auth.currentUser?.email || 'tech',
+                  validatedAt: serverTimestamp()
+                });
+              }
             });
-          }
-        }
-      })
-    }
 
-    // 9) INTERVENTIONS
-    function renderInvItem(id, d, team){
-      return `<div class="item">
-        <div><div style="font-weight:600">${d.name}</div><div class="muted">ID: ${id}</div></div>
-        <div class="row" style="justify-content:flex-end;gap:6px;align-items:center">
-          <span class="qty">${d.qty||0}</span>
-          <button class="btn small" data-team="${team}" data-id="${id}" data-inv-action="minus">−</button>
-          <button class="btn small" data-team="${team}" data-id="${id}" data-inv-action="plus">+</button>
-          <button class="btn small danger" data-team="${team}" data-id="${id}" data-inv-action="del">Supprimer</button>
-        </div>
-      </div>`;
-    }
-
-    function renderInterCard(d, id, {compact=false, showReception=false}={}){
-      const who = d.validatedBy? `<span class="chip">Validé par ${d.validatedBy.name}</span>` : '';
-      return `<div class="card">
-        <h3>MH ${d.mh} — ${fmtStatus(d.status)}</h3>
-        <div class="muted">Créé par ${d.createdBy?.name||'—'} • ${d.team==='technique'?'Technique':''}</div>
-        ${d.details? `<p style="margin:8px 0">${d.details}</p>`:''}
-        <div class="row">
-          <span class="tag">Clients présents: ${d.present?'Oui':'Non'}</span>
-          <span class="tag">Autorisation: ${d.authorize?'Oui':'Non'}</span>
-          ${who}
-        </div>
-        <div class="row" style="margin-top:10px">
-          ${compact? '' : actionButtons(d,id,showReception)}
-        </div>
-      </div>`
-    }
-
-    function actionButtons(d, id, showReception){
-      const btns = [];
-      if(showReception && (currentRole==='reception' || currentRole==='admin')){
-        ['todo','doing','done'].forEach(s=>{
-          btns.push(`<button class="btn small" data-inter-act="status" data-id="${id}" data-val="${s}">${s==='todo'?'À faire':(s==='doing'?'En cours':'Terminé')}</button>`);
-        });
+            ul.appendChild(li);
+          });
       }
-      if(currentRole==='technique' || currentRole==='admin'){
-        btns.push(`<button class="btn small" data-inter-act="take" data-id="${id}">Valider (je prends)</button>`);
-        ['todo','doing','done'].forEach(s=>{
-          btns.push(`<button class="btn small" data-inter-act="status" data-id="${id}" data-val="${s}">${s==='todo'?'À faire':(s==='doing'?'En cours':'Terminé')}</button>`);
+    }
+
+    // ===== Admin logic =====
+    function wireAdmin(role, user){
+      if(role!=='admin') return;
+      const ul = $('#usersList');
+      if(unsubUsers) unsubUsers();
+      unsubUsers = onSnapshot(query(collection(db,'users'), orderBy('createdAt','desc')), (qs)=>{
+        ul.innerHTML='';
+        qs.forEach(d=>{
+          const u = { id: d.id, ...d.data() };
+          const li = document.createElement('li');
+          li.className = 'rounded-xl border p-3 bg-white flex items-center gap-3 justify-between';
+          li.innerHTML = `
+            <div class="flex items-center gap-3">
+              <img src="${u.photoURL||''}" class="h-8 w-8 rounded-full" alt=""/>
+              <div>
+                <div class="font-semibold">${u.displayName||u.email||u.id}</div>
+                <div class="text-xs opacity-80">${u.email||''}</div>
+              </div>
+            </div>
+            <div class="flex items-center gap-2">
+              <select class="rounded-xl border p-2" data-uid="${u.id}">
+                ${ROLES.map(r=>`<option value="${r}" ${u.role===r?'selected':''}>${r}</option>`).join('')}
+              </select>
+              <button class="btn btn-primary" data-save="${u.id}">Enregistrer</button>
+            </div>
+          `;
+          li.addEventListener('click', async (e)=>{
+            const s = e.target.closest('button[data-save]'); if(!s) return;
+            const uid = s.dataset.save;
+            const newRole = li.querySelector('select').value;
+            await updateDoc(doc(db,'users', uid), { role: newRole });
+          });
+          ul.appendChild(li);
         });
-      }
-      return btns.join(' ');
-    }
-
-    function bindInterButtons(){
-      document.querySelectorAll('[data-inter-act]').forEach(btn=>{
-        btn.onclick = async ()=>{
-          const id = btn.dataset.id; const act = btn.dataset.interAct; const ref = db.collection('interventions').doc(id);
-          const snap = await ref.get(); if(!snap.exists) return;
-          if(act==='take'){
-            if(!(currentRole==='technique' || currentRole==='admin')) return alert('Réservé à la technique');
-            await ref.update({validatedBy:{uid: currentUser.uid, name: currentUser.displayName||currentUser.email}, updatedAt: firebase.firestore.FieldValue.serverTimestamp()});
-          }
-          if(act==='status'){
-            const val = btn.dataset.val;
-            if(!(currentRole==='reception' || currentRole==='technique' || currentRole==='admin')) return alert('Accès requis');
-            await ref.update({status: val, updatedAt: firebase.firestore.FieldValue.serverTimestamp()});
-          }
-        }
-      })
-    }
-    // Admin
-    $('userSearch').oninput = ()=> wireRealtime();
-
-    function renderUserList(users){
-      $('userList').innerHTML = users.map(u=>{
-        const id = u.uid;
-        return `<div class="item">
-          <div>
-            <div style="font-weight:600">${u.displayName||'—'}</div>
-            <div class="muted">${u.email||''}</div>
-          </div>
-          <div class="row" style="align-items:center;gap:6px">
-            <select id="role_${id}">
-              <option value="">— rôle —</option>
-              <option value="admin">admin</option>
-              <option value="reception">reception</option>
-              <option value="technique">technique</option>
-              <option value="menage">menage</option>
-            </select>
-            <button class="btn small" data-role-save="${id}">Enregistrer</button>
-          </div>
-        </div>`
-      }).join('');
-
-      users.forEach(async (u)=>{
-        const r = await db.collection('roles').doc(u.uid).get();
-        if(r.exists){ const v=r.data().role; const el=$('role_'+u.uid); if(el) el.value=v; }
       });
-
-      document.querySelectorAll('[data-role-save]').forEach(btn=>{
-        btn.onclick = async ()=>{
-          if(!(currentRole==='admin')) return alert('Accès admin requis');
-          const uid = btn.dataset.roleSave; const role = $('role_'+uid).value;
-          if(!role) return alert('Choisissez un rôle');
-          await db.collection('roles').doc(uid).set({role, updatedAt: firebase.firestore.FieldValue.serverTimestamp()});
-          alert('Rôle enregistré');
-        }
-      })
     }
 
-    // Footer
-    $('year').textContent = new Date().getFullYear();
+    // ===== Inventory logic =====
+    function wireInventories(role){
+      // Inventory – Tech
+      if(role==='tech' || role==='admin' || role==='reception'){
+        setupInventory('tech', '#formInvTech', '#listInvTech');
+      }
+      // Inventory – Clean
+      if(role==='clean' || role==='admin' || role==='reception'){
+        setupInventory('clean', '#formInvClean', '#listInvClean');
+      }
 
-    // Navigation par #hash (facultatif)
-    window.addEventListener('hashchange',()=>{
-      const h = location.hash.replace('#','');
-      if(SCREENS.includes(h)){ route(h); selectTab(h); }
-    });
+      function setupInventory(kind, formSel, listSel){
+        const form = document.querySelector(formSel);
+        const list = document.querySelector(listSel);
+        form.addEventListener('submit', async (e)=>{
+          e.preventDefault();
+          const fd = new FormData(form);
+          const name = (fd.get('name')||'').toString().trim();
+          let qty = parseInt(fd.get('qty')||'1', 10) || 1;
+          if(!name) return;
+          await addDoc(collection(db, `inventory_${kind}`), { name, qty, createdAt: serverTimestamp() });
+          form.reset();
+        });
+        onSnapshot(query(collection(db, `inventory_${kind}`), orderBy('createdAt','desc')), (qs)=>{
+          list.innerHTML='';
+          qs.forEach(d=>{
+            const it = { id:d.id, ...d.data() };
+            const li = document.createElement('li');
+            li.className = 'rounded-xl border p-3 bg-white flex items-center justify-between gap-2';
+            li.innerHTML = `
+              <div class="font-semibold">${it.name}</div>
+              <div class="flex items-center gap-2">
+                <button class="btn btn-outline" data-act="dec">−1</button>
+                <span class="w-8 text-center">${it.qty}</span>
+                <button class="btn btn-outline" data-act="inc">+1</button>
+                <button class="btn btn-primary" data-act="del">Supprimer</button>
+              </div>
+            `;
+            li.addEventListener('click', async (e)=>{
+              const b = e.target.closest('button[data-act]'); if(!b) return;
+              const ref = doc(db, `inventory_${kind}`, it.id);
+              if(b.dataset.act==='inc') await updateDoc(ref, { qty: (it.qty||0)+1 });
+              if(b.dataset.act==='dec') await updateDoc(ref, { qty: Math.max(0, (it.qty||0)-1) });
+              if(b.dataset.act==='del') await updateDoc(ref, { qty: -1 }).then(()=>{ /* flag for cleanup */ });
+            });
+            list.appendChild(li);
+          });
+        });
+      }
+    }
+
+    // ===== Simple client-side guard (visual) for locked interventions =====
+    // Firestore Security Rules (à coller dans la console Firebase > Firestore > Règles)
+    /*
+    rules_version = '2';
+    service cloud.firestore {
+      match /databases/{database}/documents {
+        function isSignedIn() { return request.auth != null; }
+        function isAdmin() { return isSignedIn() && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin'; }
+        function hasRole(r) { return isSignedIn() && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == r; }
+
+        match /users/{uid} {
+          allow read: if isAdmin();
+          allow write: if isAdmin(); // seul l'admin gère les rôles
+          allow create: if isSignedIn();
+          allow get: if isSignedIn() && request.auth.uid == uid || isAdmin();
+        }
+
+        match /interventions/{id} {
+          allow read: if isSignedIn();
+          // Création par réception/admin
+          allow create: if hasRole('reception') || isAdmin();
+          // MAJ par technique tant que non verrouillée
+          allow update: if (
+            (hasRole('tech') && resource.data.type == 'tech' && !resource.data.locked)
+          ) || isAdmin();
+        }
+
+        match /inventory_tech/{id} {
+          allow read: if isSignedIn();
+          allow write: if hasRole('tech') || hasRole('reception') || isAdmin();
+        }
+        match /inventory_clean/{id} {
+          allow read: if isSignedIn();
+          allow write: if hasRole('clean') || hasRole('reception') || isAdmin();
+        }
+      }
+    }
+    */
   </script>
 </body>
 </html>
