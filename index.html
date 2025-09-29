@@ -204,6 +204,10 @@
   background:linear-gradient(135deg,#bfe9ff,#7dd3fc 30%,#38bdf8 60%,#0ea5e9 100%);
   -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
   -webkit-mask-composite:xor; mask-composite:exclude}
+/* Assure que la carte est au-dessus du décor et capte les clics */
+.login-hero { position: relative; }
+.login-hero .bg { position:absolute; inset:0; z-index:0; pointer-events:none; }
+.login-card { position:relative; z-index:2; }     /* <- clé */
 
 </style>
 </head>
@@ -242,7 +246,7 @@
 </div>
 
 
-      <button id="signinBig" class="gbtn" style="margin-top:14px">
+<button id="signinBig" class="gbtn" type="button" style="margin-top:14px">
         <svg class="g-icon" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
           <path fill="#FFC107" d="M43.6 20.5H42v-.1H24v7.2h11.3C33.9 31.9 29.4 35 24 35c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.9 1.2 8 3.1l5.1-5.1C33.6 6 29 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.7-.4-3.9z"/>
           <path fill="#FF3D00" d="M6.3 14.7l5.9 4.3C13.8 15.2 18.5 12 24 12c3.1 0 5.9 1.2 8 3.1l5.1-5.1C33.6 6 29 4 24 4 16.3 4 9.6 8.4 6.3 14.7z"/>
@@ -512,9 +516,16 @@ async function doGoogleSignIn(){
   }
 }
 
-// relier les deux boutons
-$('signinBtn').onclick = doGoogleSignIn;
-document.getElementById('signinBig')?.addEventListener('click', doGoogleSignIn);
+// relier proprement les deux boutons et bloquer toute propagation
+['signinBtn','signinBig'].forEach(id=>{
+  const el = document.getElementById(id);
+  if (el) el.addEventListener('click', (e)=>{
+    e.preventDefault();
+    e.stopPropagation();
+    doGoogleSignIn();
+  });
+});
+
 
 
 let currentUser = null; let currentRole = null;
@@ -886,7 +897,6 @@ function wireRealtime(){
         }
       })
     }
-
     // Footer
     $('year').textContent = new Date().getFullYear();
 
