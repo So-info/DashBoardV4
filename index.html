@@ -131,37 +131,39 @@
   .ring{box-shadow:0 0 0 4px var(--ring)}
 
    /* ====== LOGIN — Hero + Glass card ====== */
-.login-hero{
-  position:relative; min-height:calc(100vh - 80px); display:grid; place-items:center;
-}
-.login-hero .bg{
-  position:absolute; inset:0; overflow:hidden; pointer-events:none;
-  background:radial-gradient(120% 120% at 0% 0%, #eef7ff 0%, #f7fbff 45%, #ffffff 100%);
-}
-.login-hero .blob{
-  position:absolute; width:420px; height:420px; border-radius:999px; filter:blur(30px); opacity:.55;
-  animation:float 12s ease-in-out infinite;
-}
-.login-hero .b1{left:-80px; top:-60px; background:radial-gradient(closest-side,#bfe9ff,#7dd3fc,#38bdf8);}
-.login-hero .b2{right:-120px; bottom:-120px; background:radial-gradient(closest-side,#e0f2fe,#bae6fd,#7dd3fc);}
-.login-hero .b3{left:40%; top:60%; width:320px; height:320px; background:radial-gradient(closest-side,#dbeafe,#bfdbfe,#93c5fd); animation-duration:16s;}
+/* === LOGIN plein écran (header masqué sur login) === */
+.login-hero{position:relative; min-height:100vh; display:grid; place-items:center; padding:clamp(16px,4vw,32px)}
+.login-hero .bg{position:absolute; inset:0; overflow:hidden; pointer-events:none;
+  background:radial-gradient(120% 120% at 0% 0%, #eef7ff 0%, #f7fbff 45%, #ffffff 100%);}
+.login-hero .blob{position:absolute; width:480px; height:480px; border-radius:999px; filter:blur(34px); opacity:.55; animation:float 14s ease-in-out infinite}
+.login-hero .b1{left:-120px; top:-80px; background:radial-gradient(closest-side,#bfe9ff,#7dd3fc,#38bdf8)}
+.login-hero .b2{right:-140px; bottom:-140px; background:radial-gradient(closest-side,#e0f2fe,#bae6fd,#7dd3fc)}
+.login-hero .b3{left:38%; top:58%; width:360px; height:360px; background:radial-gradient(closest-side,#dbeafe,#bfdbfe,#93c5fd); animation-duration:18s}
 @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
 
-.login-card{
-  position:relative; width:min(560px,92vw);
-  padding:28px 22px; border-radius:26px;
-  background:linear-gradient(180deg,rgba(255,255,255,.7),rgba(255,255,255,.55));
-  border:1px solid #e7eff7; backdrop-filter:blur(10px);
-  box-shadow:0 18px 55px rgba(2,6,23,.12);
-}
-.login-card h1{margin:6px 0 6px 0; font-size:1.38rem; letter-spacing:.2px}
-.login-card h1 span{color:#0ea5e9}
-.login-card p{margin:0 0 14px 0}
-.logo-xl{
-  width:64px;height:64px;border-radius:18px;
-  background:radial-gradient(120% 120% at 100% 0, #bfe9ff, #7dd3fc 40%, #38bdf8 60%, #0ea5e9 100%);
-  box-shadow:0 16px 28px rgba(56,189,248,.35);
-}
+/* Carte “verre” avec bordure dégradée premium */
+.login-card{position:relative; width:min(620px,94vw); padding:26px 22px; border-radius:28px;
+  background:linear-gradient(180deg,rgba(255,255,255,.75),rgba(255,255,255,.55));
+  border:1px solid rgba(56,189,248,.25); backdrop-filter:blur(10px); box-shadow:0 20px 60px rgba(2,6,23,.12)}
+.login-card.fancy::before{content:\"\"; position:absolute; inset:-1px; border-radius:inherit; padding:1px;
+  background:linear-gradient(135deg,#bfe9ff,#7dd3fc 30%,#38bdf8 60%,#0ea5e9 100%);
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0); -webkit-mask-composite:xor; mask-composite:exclude}
+.login-top{display:flex; gap:14px; align-items:center}
+.login-titles h1{margin:2px 0 4px 0; font-size:1.6rem; letter-spacing:.2px}
+.login-titles .accent{color:#0ea5e9}
+.login-titles .mini{font-weight:800; letter-spacing:.18px}
+
+/* Big Google button */
+.gbtn{display:flex; align-items:center; justify-content:center; gap:10px; width:100%; height:56px; border-radius:16px; cursor:pointer;
+  font-weight:800; font-size:1rem; letter-spacing:.2px; background:linear-gradient(180deg,#ffffff,#f5faff);
+  border:1px solid #dbe9f6; color:#0b2440; box-shadow:0 12px 30px rgba(2,6,23,.12); transition:transform .08s ease, box-shadow .2s ease, filter .15s ease}
+.gbtn:hover{transform:translateY(-1px); box-shadow:0 16px 40px rgba(2,6,23,.16)}
+.gbtn:active{transform:translateY(0)}
+.g-icon{width:22px;height:22px}
+.g-arrow{margin-left:2px; transition:transform .15s ease}
+.gbtn:hover .g-arrow{transform:translateX(3px)}
+.login-meta{color:#637189; font-size:.9rem; text-align:center; margin-top:10px}
+
 
 /* Big Google button */
 .gbtn{
@@ -182,21 +184,42 @@
 @media (min-width:768px){
   .login-card{padding:34px 28px}
 }
+/* --- LOGIN: logo image au lieu du carré dégradé --- */
+.login-top{display:flex; gap:14px; align-items:center}
+.logo-img{
+  height:64px; width:auto; object-fit:contain;
+  filter: drop-shadow(0 8px 18px rgba(2,6,23,.12));
+}
+@media (min-width:768px){ .logo-img{height:72px} }
+
+.login-titles h1{margin:2px 0 4px 0; font-size:1.6rem; letter-spacing:.2px}
+.login-titles .accent{color:#0ea5e9} /* bleu ciel */
+.login-titles .mini{font-weight:800; letter-spacing:.18px}
+
+/* Carte “verre” avec bordure dégradée (garde si tu l’as déjà) */
+.login-card{position:relative; width:min(620px,94vw); padding:26px 22px; border-radius:28px;
+  background:linear-gradient(180deg,rgba(255,255,255,.75),rgba(255,255,255,.55));
+  border:1px solid rgba(56,189,248,.25); backdrop-filter:blur(10px); box-shadow:0 20px 60px rgba(2,6,23,.12)}
+.login-card.fancy::before{content:""; position:absolute; inset:-1px; border-radius:inherit; padding:1px;
+  background:linear-gradient(135deg,#bfe9ff,#7dd3fc 30%,#38bdf8 60%,#0ea5e9 100%);
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
+  -webkit-mask-composite:xor; mask-composite:exclude}
 
 </style>
 </head>
 <body>
-  <header>
-    <div class="container nav">
-      <div class="brand"><div class="logo"></div> La Plage — Intranet</div>
-      <button id="backBtn" class="back">⟵ Retour</button>
-      <div id="rolePill" class="pill hidden"></div>
-      <div class="spacer"></div>
-      <button id="signinBtn" class="btn primary">Connexion Google</button>
-      <button id="signoutBtn" class="btn ghost hidden">Se déconnecter</button>
-    </div>
-  </header>
+<header id="appHeader">
+  <div class="container nav">
+    <div class="brand"><div class="logo"></div> La Plage — Intranet</div>
+    <button id="backBtn" class="back">⟵ Retour</button>
+    <div id="rolePill" class="pill hidden"></div>
+    <div class="spacer"></div>
+    <button id="signinBtn" class="btn primary">Connexion Google</button>
+    <button id="signoutBtn" class="btn ghost hidden">Se déconnecter</button>
+  </div>
+</header>
 <!-- ===== ÉCRAN DE CONNEXION ===== -->
+
 <section id="screen-login" class="login active">
   <div class="login-hero">
     <div class="bg">
@@ -205,19 +228,22 @@
       <span class="blob b3"></span>
     </div>
 
-    <div class="login-card">
-      <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px">
-        <div class="logo-xl"></div>
-        <div>
-          <div class="muted" style="font-weight:800;letter-spacing:.2px">Camping</div>
-          <h1 style="margin:2px 0 0 0">La Plage <span>— Intranet</span></h1>
-        </div>
-      </div>
+    <div class="login-card fancy">
+<div class="login-top">
+  <!-- Mets le logo dans ton repo et ajuste le chemin si besoin -->
+  <img class="logo-img" src="assets/logo-camping-la-plage.png" alt="Camping La Plage — Argelès-sur-Mer" />
+  <div class="login-titles">
+    <div class="mini muted">Camping</div>
+    <h1>La Plage <span class="accent">Dashboard</span></h1>
+    <p class="muted">
+      Connectez-vous pour accéder à votre tableau de bord.
+    </p>
+  </div>
+</div>
 
-      <p class="muted">Espace mobile pour les équipes (Admin, Réception, Technique, Ménage). Connectez-vous avec Google pour accéder à votre tableau de bord.</p>
 
       <button id="signinBig" class="gbtn" style="margin-top:14px">
-        <svg class="g-icon" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+        <svg class="g-icon" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
           <path fill="#FFC107" d="M43.6 20.5H42v-.1H24v7.2h11.3C33.9 31.9 29.4 35 24 35c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.9 1.2 8 3.1l5.1-5.1C33.6 6 29 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.7-.4-3.9z"/>
           <path fill="#FF3D00" d="M6.3 14.7l5.9 4.3C13.8 15.2 18.5 12 24 12c3.1 0 5.9 1.2 8 3.1l5.1-5.1C33.6 6 29 4 24 4 16.3 4 9.6 8.4 6.3 14.7z"/>
           <path fill="#4CAF50" d="M24 44c5.3 0 10.2-2 13.8-5.2l-6.4-5.2C29.4 35 26.8 36 24 36c-5.3 0-9.7-3.6-11.3-8.4l-6.5 5C9.5 39.6 16.2 44 24 44z"/>
@@ -231,6 +257,7 @@
     </div>
   </div>
 </section>
+
 
   <main class="container">
     <!-- DASHBOARD -->
@@ -463,58 +490,76 @@ const SCREENS = [
     }
 
     // 4) AUTH
-    $('signinBtn').onclick = async ()=>{
-      const provider = new firebase.auth.GoogleAuthProvider();
-      provider.setCustomParameters({ prompt: 'select_account' });
-      await auth.signInWithPopup(provider);
-    };
-    $('signoutBtn').onclick = ()=> auth.signOut();
-
-    let currentUser = null; let currentRole = null;
-    let unsubInter=null, unsubTech=null, unsubIT=null, unsubIM=null, unsubUsers=null;
-
-    auth.onAuthStateChanged(async (user)=>{
-      currentUser = user || null;
-if(!user){
-  $('signoutBtn').classList.add('hidden');
-  $('signinBtn').classList.remove('hidden');
-  $('rolePill').classList.add('hidden');
-  $('roleLabel').textContent = '—';
-  $('quickLinks').innerHTML=''; $('recentInterventions').innerHTML='';
-  [unsubInter,unsubTech,unsubIT,unsubIM,unsubUsers].forEach(u=>u && u());
-
-  // Afficher la page de connexion et masquer la tabbar
-  route('screen-login');
-  $('tabbar').classList.add('hidden');
-  // Bouton géant = même action que le bouton d'en-tête
-  const big = document.getElementById('signinBig');
-  if(big) big.onclick = $('signinBtn').onclick;
-  return;
+// remplace l'ancien $('signinBtn').onclick = async ()=>{ ... } par :
+// Connexion Google réutilisable
+async function doGoogleSignIn(){
+  const provider = new firebase.auth.GoogleAuthProvider();
+  provider.setCustomParameters({ prompt: 'select_account' });
+  await auth.signInWithPopup(provider);
 }
+$('signinBtn').onclick = doGoogleSignIn;
 
+let currentUser = null; let currentRole = null;
+let unsubInter=null, unsubTech=null, unsubIT=null, unsubIM=null, unsubUsers=null;
 
-      $('signoutBtn').classList.remove('hidden');
-      $('signinBtn').classList.add('hidden');
+auth.onAuthStateChanged(async (user)=>{
+  currentUser = user || null;
 
-      // Créer/MAJ profil minimal
-      const profRef = db.collection('users').doc(user.uid);
-      await profRef.set({
-        uid:user.uid, displayName:user.displayName || '', email:user.email || '', photoURL:user.photoURL || '',
-        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-      }, {merge:true});
+  if(!user){
+    // reset UI
+    $('signoutBtn').classList.add('hidden');
+    $('signinBtn').classList.remove('hidden');
+    $('rolePill').classList.add('hidden');
+    $('roleLabel').textContent = '—';
+    $('quickLinks').innerHTML=''; 
+    $('recentInterventions').innerHTML='';
+    [unsubInter,unsubTech,unsubIT,unsubIM,unsubUsers].forEach(u=>u && u());
 
-      // Charger rôle
-      const roleDoc = await db.collection('roles').doc(user.uid).get();
-      currentRole = roleDoc.exists ? roleDoc.data().role : null;
+    // CACHER le header sur la page de connexion
+    const hdr = document.getElementById('appHeader');
+    if(hdr) hdr.style.display = 'none';
 
-      $('roleLabel').textContent = currentRole || 'non défini';
-      $('rolePill').textContent = (user.displayName||user.email) + (currentRole? ' — '+currentRole.toUpperCase() : ' — rôle à attribuer');
-      $('rolePill').classList.remove('hidden');
+    // Aller sur la page login et brancher le gros bouton
+    route('screen-login');
+    $('tabbar').classList.add('hidden');
+    const big = document.getElementById('signinBig');
+    if(big) big.onclick = doGoogleSignIn;
+    return;
+  }
 
-      buildDashboard();
-      wireRealtime();
-      route('screen-dashboard');
-    });
+  // ----- ICI: utilisateur connecté -----
+
+  // AFFICHER le header
+  const hdr = document.getElementById('appHeader');
+  if(hdr) hdr.style.display = '';
+
+  $('signoutBtn').classList.remove('hidden');
+  $('signinBtn').classList.add('hidden');
+
+  // Profil minimal pour la liste Admin
+  const profRef = db.collection('users').doc(user.uid);
+  await profRef.set({
+    uid:user.uid,
+    displayName:user.displayName || '',
+    email:user.email || '',
+    photoURL:user.photoURL || '',
+    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+  }, {merge:true});
+
+  // Rôle
+  const roleDoc = await db.collection('roles').doc(user.uid).get();
+  currentRole = roleDoc.exists ? roleDoc.data().role : null;
+
+  $('roleLabel').textContent = currentRole || 'non défini';
+  $('rolePill').textContent = (user.displayName||user.email) + (currentRole ? ' — ' + currentRole.toUpperCase() : ' — rôle à attribuer');
+  $('rolePill').classList.remove('hidden');
+
+  buildDashboard();
+  wireRealtime();
+
+  // Arriver sur l'accueil après login
+  route('screen-dashboard');
+});
 
     // 5) DASHBOARD + onglets bas selon rôle
     function buildDashboard(){
@@ -827,7 +872,3 @@ if(!user){
   </script>
 </body>
 </html>
-
-
-
-
